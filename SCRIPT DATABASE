@@ -1,0 +1,11 @@
+CREATE TABLE conexiones_realizadas
+(
+  numero serial NOT NULL,
+  fecha date NOT NULL,
+  hora time NOT NULL,
+  IP_origen integer NOT NULL,
+  puerto_origen integer NOT NULL,
+  IP_destino integer NOT NULL,
+  puerto_destino integer NOT NULL,
+  CONSTRAINT clave_principal PRIMARY KEY (numero)
+);
