@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.net.InetSocketAddress;
 
 
@@ -28,6 +29,7 @@ public class HiloUsuario extends Thread {
 		try {
 			// obtiene la ip del cliente
 			String ip = ((InetSocketAddress)socket.getRemoteSocketAddress()).toString();
+			int puerto = socket.getPort();
             System.out.println("conexion establecida con: " + ip);
 			
 			// obtiene los streams de entrada y salida
@@ -44,7 +46,7 @@ public class HiloUsuario extends Thread {
             }
             
             // agrega el cliente al registro de conexiones
-            origen = new Conexion(ip, Estado.IDLE, this, out);
+            origen = new Conexion(ip, puerto, Estado.IDLE, this, out);
             Registro.agregarConexion(ip, origen);
             
             String line;
@@ -69,6 +71,11 @@ public class HiloUsuario extends Thread {
                 	else {
                     	out.println("llamando a " + line);
                     	destino.out.println("recibiendo llamada de " + ip);
+                    	try {
+							Registro.insertar(origen, destino);
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
                 	}
             		break;
             	
