@@ -49,7 +49,7 @@ public class Registro {
 		}
 	}
 	
-	public static long insertar(Conexion origen, Conexion destino) throws SQLException {
+	public static long insertar(Conexion origen, Conexion destino) {
 
         String SQL = "INSERT INTO conexiones_realizadas(fecha,hora,ip_origen,puerto_origen,ip_destino,puerto_destino) " + "VALUES(?,?,?,?,?,?)";
         java.util.Date date = new java.util.Date();
@@ -59,7 +59,7 @@ public class Registro {
         
         try 
         {
-        	conn = basedatos.connect();
+        	conn = BaseDatos.connect();
         	PreparedStatement ps = conn.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
             ps.setDate(1, new java.sql.Date(date.getTime()));
             ps.setTime(2, new java.sql.Time(date.getTime()));

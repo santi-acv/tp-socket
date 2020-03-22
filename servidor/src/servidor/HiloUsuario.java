@@ -71,11 +71,7 @@ public class HiloUsuario extends Thread {
                 	else {
                     	out.println("llamando a " + line);
                     	destino.out.println("recibiendo llamada de " + ip);
-                    	try {
-							Registro.insertar(origen, destino);
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
+                    	Registro.insertar(origen, destino);
                 	}
             		break;
             	
