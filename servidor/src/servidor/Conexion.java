@@ -1,21 +1,22 @@
 package servidor;
 
-import java.io.PrintWriter;
-
-import servidor.HiloUsuario.Estado;
-
 public class Conexion {
+	
+	public enum Estado {
+		IDLE, CALL
+	}
+	
 	public String ip;
 	public int puerto;
 	public Estado estado;
 	public HiloUsuario hilo;
-	public PrintWriter out;
+	public InterfazJSON json;
 	
-	Conexion(String ip, int puerto, Estado estado, HiloUsuario hilo, PrintWriter out) {
+	Conexion(String ip, int puerto, HiloUsuario hilo, InterfazJSON json) {
 		this.ip = ip;
 		this.puerto = puerto;
-		this.estado = estado;
+		this.estado = Estado.IDLE;
 		this.hilo = hilo;
-		this.out = out;
+		this.json = json;
 	}
 }

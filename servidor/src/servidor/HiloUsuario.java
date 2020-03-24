@@ -1,19 +1,10 @@
 package servidor;
 
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.net.InetSocketAddress;
 
-
 public class HiloUsuario extends Thread {
-	
-	public enum Estado {
-		IDLE, CALL
-	}
 
 	private Socket socket;
 	private Conexion origen;
@@ -27,61 +18,55 @@ public class HiloUsuario extends Thread {
 
 	public void run() {
 		try {
+			// crea una interfaz para recibir y enviar mensajes JSON
+			InterfazJSON json = new InterfazJSON(socket);
+			
 			// obtiene la ip del cliente
+			// TODO reemplazar por nombre de usuario
 			String ip = ((InetSocketAddress)socket.getRemoteSocketAddress()).toString();
 			int puerto = socket.getPort();
             System.out.println("conexion establecida con: " + ip);
-			
-			// obtiene los streams de entrada y salida
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader( 
-                    socket.getInputStream()));
-            
-            // TODO buscar el cliente en la base de datos
-            if (!Registro.validarUsuario(ip)) {
-            	out.close();
-            	in.close();
-            	return;
-            }
             
             // agrega el cliente al registro de conexiones
-            origen = new Conexion(ip, puerto, Estado.IDLE, this, out);
+            origen = new Conexion(ip, puerto, this, json);
             Registro.agregarConexion(ip, origen);
             
-            String line;
-            
-            // escucha el socket y procesa la entrada 
-            while ((line = in.readLine()) != null) {
-            	switch (origen.estado) {
+            // escucha el socket y lee el siguiente mensaje
+            int tipo_mensaje;
+            while ((tipo_mensaje = json.leerMensaje()) != -1) {
+            	switch (tipo_mensaje) {
             	
-            	// el cliente esta disponible para llamadas
-            	case IDLE:
-            		
-            		// TODO convertir line en el id del destino
-            		
-            		// obtiene la informacion del cliente destino
-            		destino = Registro.solicitarConexion(line);
-            		
-            		// TODO enviar respuesta a traves de la API JSON
-            		if (destino == null)
-            			out.println("el destino de llamada no existe");
-            		else if (!Registro.establecerConexion(origen, destino))
-            			out.println("el destino se encuentra ocupado");
-                	else {
-                    	out.println("llamando a " + line);
-                    	destino.out.println("recibiendo llamada de " + ip);
-                    	Registro.insertar(origen, destino);
-                	}
+            	// ver clientes conectados
+            	case 1:
+            		// TODO mostrar lista de clientes
             		break;
             	
-            	// el cliente esta en una llamada
-            	case CALL:
-            		
-            		// TODO convertir line en el mensaje a enviar
-            		
-            		// envia el mensaje al destinatario
-            		destino.out.println(line);
+            	// iniciar llamada
+            	case 2:
+            		String ip_destino;
+            		if ((ip_destino = json.obtenerDestino()) == null) {
+            			json.enviarError(2, "El mensaje no especifica un destino.");
+            		} else if ((destino = Registro.solicitarConexion(ip_destino)) == null) {
+            			json.enviarError(3, "No se encuentra al cliente de destino.");
+            		} else if (!Registro.establecerConexion(origen, destino)) {
+            			json.enviarError(4, "El destino se encuentra ocupado.");
+            			destino = null;
+            		} else {
+            			// TODO notificar al destino de la llamada
+            			json.enviarOk();
+                    	Registro.insertar(origen, destino);
+                    	System.out.println(ip + " llamando a " + ip_destino);
+            		}
+            		break;
+            	
+            	// conversar
+            	case 3:
+            		json.redirigirMensaje(destino.json);
+            		break;
+            	
+            	// terminar llamada
+            	case 4:
+            		Registro.terminarConexion(origen, destino);
             		break;
             	}
             }
