@@ -29,7 +29,7 @@ public class InterfazJSON {
 				tipo_operacion = mensaje.getInt("tipo_operacion");
 				return tipo_operacion;
 			} catch (JSONException ex) {
-				enviarError(-1, "El mensaje no corresponde a un objeto JSON");
+				enviarError(-2, "El mensaje no corresponde a un objeto JSON");
 			}
 		}
 		return -1;
@@ -56,6 +56,11 @@ public class InterfazJSON {
 	}
 
 	public void redirigirMensaje(InterfazJSON json) {
-		json.out.println(mensaje);
+		if (mensaje.has("cuerpo")) {
+			json.out.println(mensaje);
+			enviarOk();
+		} else {
+			enviarError(1, "El mensaje debe tener un cuerpo.");
+		}
 	}
 }

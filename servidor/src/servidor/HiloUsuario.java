@@ -45,11 +45,11 @@ public class HiloUsuario extends Thread {
             	case 2:
             		String ip_destino;
             		if ((ip_destino = json.obtenerDestino()) == null) {
-            			json.enviarError(2, "El mensaje no especifica un destino.");
+            			json.enviarError(1, "El mensaje no especifica un destino.");
             		} else if ((destino = Registro.solicitarConexion(ip_destino)) == null) {
-            			json.enviarError(3, "No se encuentra al cliente de destino.");
+            			json.enviarError(2, "No se encuentra al cliente de destino.");
             		} else if (!Registro.establecerConexion(origen, destino)) {
-            			json.enviarError(4, "El destino se encuentra ocupado.");
+            			json.enviarError(3, "El destino se encuentra ocupado.");
             			destino = null;
             		} else {
             			// TODO notificar al destino de la llamada
@@ -67,6 +67,10 @@ public class HiloUsuario extends Thread {
             	// terminar llamada
             	case 4:
             		Registro.terminarConexion(origen, destino);
+            		break;
+            	
+            	default:
+            		json.enviarError(-1, "No existe una operación con ese código");
             		break;
             	}
             }
