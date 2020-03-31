@@ -27,22 +27,37 @@ public class HiloUsuario extends Thread {
 			InterfazJSON json = new InterfazJSON(socket);
 			
 			// agrega el cliente al registro de conexiones
-			String ip = ((InetSocketAddress)socket.getRemoteSocketAddress()).toString();
-            conexion = new Conexion(ip, this, json, socket);
+			String nombre = ((InetSocketAddress)socket.getRemoteSocketAddress()).toString();
+            conexion = new Conexion(nombre, this, json, socket);
             Registro.agregarConexion(conexion.nombre, conexion);
-            System.out.println(ip);
+            System.out.println(nombre);
             
             // recibe un mensaje del socket y lo procesa segun el tipo
             while (true) {
             	switch (json.leerMensaje()) {
             	
-            	// el socket esta cerrado
-            	case 0:
+            	// cerrar sesion
+            	case -1:
+            		json.enviarOk();
+            		json.cerrar();
+            		socket.close();
             		return;
+            	
+            	// cambiar nombre
+            	case 0:
+            		if ((nombre = json.obtenerNombre()) == null) {
+            			json.enviarError(1, "El mensaje no especifica un destino.");
+            		} else if (!Registro.cambiarNombre(nombre, conexion)) {
+            			json.enviarError(2, "Ya existe un usuario con ese nombre.");
+            		} else {
+            			json.enviarOk();
+            		}
+            		break;
             	
             	// ver clientes conectados
             	case 1:
-            		// TODO mostrar lista de clientes
+            		Registro.tabla.forEachValue(1, json.funcion());
+            		json.enviarLista();
             		break;
             	
             	// iniciar llamada
@@ -51,9 +66,9 @@ public class HiloUsuario extends Thread {
         			HiloLlamada hilo;
             		if (!conexion.estado.equals(Estado.IDLE)) {
             			json.enviarError(3, "El cliente se encuentra ocupado.");
-            		} else if ((ip = json.obtenerDestino()) == null) {
+            		} else if ((nombre = json.obtenerDestino()) == null) {
             			json.enviarError(1, "El mensaje no especifica un destino.");
-            		} else if ((destino = Registro.solicitarConexion(ip)) == null) {
+            		} else if ((destino = Registro.solicitarConexion(nombre)) == null) {
             			json.enviarError(2, "No se encuentra al cliente de destino.");
             		} else if ((hilo = Registro.establecerLlamada(conexion, destino)) == null) {
             			json.enviarError(3, "El destino se encuentra ocupado.");

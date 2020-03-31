@@ -84,5 +84,13 @@ public class Registro {
 			}
 		}
 	}
-	
+
+	public static boolean cambiarNombre(String nombre, Conexion conexion) {
+		boolean ausente = tabla.putIfAbsent(nombre, conexion) == null;
+		if (ausente) {
+				tabla.remove(conexion.nombre);
+				conexion.nombre = nombre;
+		}
+		return ausente;
+	}
 }
