@@ -2,8 +2,10 @@ package hilos;
 
 import recursos.Conexion;
 import recursos.Conexion.Estado;
+import recursos.CodigoEstado;
 import recursos.InterfazJSON;
 import recursos.Registro;
+import recursos.BaseDatos;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -29,8 +31,7 @@ public class HiloUsuario extends Thread {
 			// agrega el cliente al registro de conexiones
 			String nombre = ((InetSocketAddress)socket.getRemoteSocketAddress()).toString();
             conexion = new Conexion(nombre, this, json, socket);
-            Registro.agregarConexion(conexion.nombre, conexion);
-            System.out.println(nombre);
+            Registro.tabla.put(nombre, conexion);
             
             // recibe un mensaje del socket y lo procesa segun el tipo
             while (true) {
@@ -38,7 +39,7 @@ public class HiloUsuario extends Thread {
             	
             	// cerrar sesion
             	case -1:
-            		json.enviarOk();
+            		json.enviarEstado(CodigoEstado.OK);
             		json.cerrar();
             		socket.close();
             		return;
@@ -46,11 +47,11 @@ public class HiloUsuario extends Thread {
             	// cambiar nombre
             	case 0:
             		if ((nombre = json.obtenerNombre()) == null) {
-            			json.enviarError(1, "El mensaje no especifica un destino.");
+            			json.enviarEstado(CodigoEstado.FALTA_NOMBRE);
             		} else if (!Registro.cambiarNombre(nombre, conexion)) {
-            			json.enviarError(2, "Ya existe un usuario con ese nombre.");
+            			json.enviarEstado(CodigoEstado.NOMBRE_DUPLICADO);
             		} else {
-            			json.enviarOk();
+            			json.enviarEstado(CodigoEstado.OK);
             		}
             		break;
             	
@@ -65,18 +66,16 @@ public class HiloUsuario extends Thread {
             		Conexion destino;
         			HiloLlamada hilo;
             		if (!conexion.estado.equals(Estado.IDLE)) {
-            			json.enviarError(3, "El cliente se encuentra ocupado.");
+            			json.enviarEstado(CodigoEstado.ORIGEN_OCUPADO);
             		} else if ((nombre = json.obtenerDestino()) == null) {
-            			json.enviarError(1, "El mensaje no especifica un destino.");
-            		} else if ((destino = Registro.solicitarConexion(nombre)) == null) {
-            			json.enviarError(2, "No se encuentra al cliente de destino.");
+            			json.enviarEstado(CodigoEstado.FALTA_DESTINO);
+            		} else if ((destino = Registro.tabla.get(nombre)) == null) {
+            			json.enviarEstado(CodigoEstado.DESTINO_INVALIDO);
             		} else if ((hilo = Registro.establecerLlamada(conexion, destino)) == null) {
-            			json.enviarError(3, "El destino se encuentra ocupado.");
+            			json.enviarEstado(CodigoEstado.DESTINO_OCUPADO);
             		} else {
             			json.enviarLlamada(enlace.json);
                     	hilo.start();
-            			System.out.println(conexion.nombre+"  --> "+enlace.nombre);
-            			//BaseDatos.insertar(conexion, enlace);
             		}
             		break;
             	
@@ -87,32 +86,30 @@ public class HiloUsuario extends Thread {
             			enlace.estado.equals(Estado.TALK)) {
             			json.redirigirMensaje(enlace.json);
             		} else {
-            			json.enviarError(2, "El usuario no se encuentra en una llamada");
+            			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
             		break;
             	
             	// terminar llamada
             	case 4:
             		if (enlace != null && Registro.terminarLlamada(conexion, enlace)) {
-            			json.enviarOk();
-            			System.out.println(conexion.nombre+" |--> ");
+            			json.enviarEstado(CodigoEstado.OK);
             		} else {
-            			json.enviarError(2, "El usuario no se encuentra en una llamada");
+            			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
             		break;
             	
             	// contestar llamada
             	case 5:
             		if (Registro.contestarLLamada(enlace, conexion)) {
-            			json.enviarOk();
-                		System.out.println(conexion.nombre+" <--> "+enlace.nombre);
+            			json.enviarEstado(CodigoEstado.OK);
             		} else {
-            			json.enviarError(2, "El usuario no esta recibiendo una llamada.");
+            			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
             		break;
             	
             	default:
-            		json.enviarError(-1, "No existe una operación con ese código");
+            		json.enviarEstado(CodigoEstado.TIPO_INVALIDO);
             		break;
             	}
             }

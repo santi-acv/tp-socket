@@ -7,14 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Registro {
 	
-	public static ConcurrentHashMap<String, Conexion> tabla;
-	
-	public static void agregarConexion(String id, Conexion conexion) {
-		tabla.put(id, conexion);
-	}
-	
-	public static Conexion solicitarConexion(String id) {
-		return tabla.get(id);
+	public static ConcurrentHashMap<String, Conexion> tabla = new ConcurrentHashMap<String, Conexion>();
+
+	public static boolean cambiarNombre(String nombre, Conexion conexion) {
+		boolean ausente = tabla.putIfAbsent(nombre, conexion) == null;
+		if (ausente) {
+				tabla.remove(conexion.nombre);
+				conexion.nombre = nombre;
+		}
+		return ausente;
 	}
 
 	public static HiloLlamada establecerLlamada(Conexion origen, Conexion destino) {
@@ -55,6 +56,7 @@ public class Registro {
 					destino.estado.equals(Estado.RING)) {
 					origen.estado = Estado.TALK;
 					destino.estado = Estado.TALK;
+					origen.llamada.interrupt();
 					return true;
 				} else {
 					return false;
@@ -83,14 +85,5 @@ public class Registro {
 				}
 			}
 		}
-	}
-
-	public static boolean cambiarNombre(String nombre, Conexion conexion) {
-		boolean ausente = tabla.putIfAbsent(nombre, conexion) == null;
-		if (ausente) {
-				tabla.remove(conexion.nombre);
-				conexion.nombre = nombre;
-		}
-		return ausente;
 	}
 }

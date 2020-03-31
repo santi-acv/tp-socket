@@ -31,12 +31,12 @@ public class InterfazJSON {
 			try {
 				mensaje = new JSONObject(linea);
 			} catch (JSONException ex) {
-				enviarError(-3, "El mensaje no corresponde a un objeto JSON.");
+				enviarEstado(CodigoEstado.JSON_INVALIDO);
 				continue;
 			}
 			if (mensaje.has("tipo_operacion"))
 				return tipo_operacion = mensaje.getInt("tipo_operacion");
-			enviarError(-2, "Se debe especificar un tipo de operación.");
+			enviarEstado(CodigoEstado.FALTA_TIPO);
 		}
 		return -1;
 	}
@@ -55,30 +55,22 @@ public class InterfazJSON {
 		llamada.put("mensaje", "ok");
 		llamada.put("tipo_operacion", tipo_operacion);
 		json.out.println(llamada.toString());
-		enviarOk();
+		enviarEstado(CodigoEstado.OK);
 	}
 
 	public void redirigirMensaje(InterfazJSON json) {
 		if (mensaje.has("cuerpo")) {
 			json.out.println(mensaje);
-			enviarOk();
+			enviarEstado(CodigoEstado.OK);
 		} else {
-			enviarError(1, "El mensaje debe tener un cuerpo.");
+			enviarEstado(CodigoEstado.FALTA_CUERPO);
 		}
 	}
 	
-	public void enviarOk() {
+	public void enviarEstado(CodigoEstado codigo) {
 		JSONObject respuesta = new JSONObject();
-		respuesta.put("estado", 0);
-		respuesta.put("mensaje", "ok");
-		respuesta.put("tipo_operacion", tipo_operacion);
-		out.println(respuesta.toString());
-	}
-
-	public void enviarError(int codigo, String mensaje) {
-		JSONObject respuesta = new JSONObject();
-		respuesta.put("estado", codigo);
-		respuesta.put("mensaje", mensaje);
+		respuesta.put("estado", codigo.estado);
+		respuesta.put("mensaje", codigo.mensaje);
 		respuesta.put("tipo_operacion", tipo_operacion);
 		out.println(respuesta.toString());
 	}

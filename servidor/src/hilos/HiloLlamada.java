@@ -1,5 +1,6 @@
 package hilos;
 
+import recursos.CodigoEstado;
 import recursos.Conexion;
 import recursos.Conexion.Estado;
 
@@ -35,8 +36,8 @@ public class HiloLlamada extends Thread {
 					destino.estado.equals(Estado.RING)) {
 					origen.reiniciar();
 					destino.reiniciar();
-					origen.json.enviarError(4, "El destino no contesta la llamada");
-					destino.json.enviarError(4, "La llamada no fue contestada a tiempo");
+					origen.json.enviarEstado(CodigoEstado.NO_CONTESTA);
+					destino.json.enviarEstado(CodigoEstado.NO_CONTESTA);
 				}
 			}
 		}

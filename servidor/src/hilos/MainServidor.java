@@ -1,11 +1,7 @@
 package hilos;
 
-import recursos.Conexion;
-import recursos.Registro;
-
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MainServidor {
 	// indica si el servidor sigue aceptando conexiones
@@ -13,7 +9,6 @@ public class MainServidor {
 
 	public static void main(String[] args) throws IOException {
 		ServerSocket serverSocket = null;
-		Registro.tabla = new ConcurrentHashMap<String, Conexion>();
 		
 		// crea un socket para el servidor
 		try {
