@@ -1,4 +1,7 @@
-package servidor;
+package hilos;
+
+import recursos.Conexion;
+import recursos.Registro;
 
 import java.io.IOException;
 import java.net.ServerSocket;
