@@ -53,7 +53,6 @@ public class ClienteAPI {
 		return this.entrada;
 	}
 	
-	// TODO: Hacer sincrono las funciones ???
 	
 	/**
 	 *  Cierra la conexión del cliente al servidor
