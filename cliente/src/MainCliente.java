@@ -5,21 +5,28 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+
 public class MainCliente {
 
 	public static void main(String[] args) throws IOException {
-		Socket socket = null;
+		ClienteAPI cliente;
         PrintWriter out = null;
         BufferedReader in = null;
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
         try {
-            socket = new Socket("localhost", 4444);
+            //socket = new Socket("localhost", 4444);
+        	cliente = new ClienteAPI("localhost",4444);
             // enviamos nosotros
-            out = new PrintWriter(socket.getOutputStream(), true);
-
+            out = cliente.obtenerStreamSalida();
             //viene del servidor
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            in = cliente.obtenerStreamEntrada();
+            //Empezamos
+            new HiloImprimir(in).start();
+            String line;
+            while ((line = stdIn.readLine()) != null) {
+    		    out.println(line);
+    		}
         } catch (UnknownHostException e) {
             System.err.println("Host desconocido");
             System.exit(1);
@@ -28,12 +35,7 @@ public class MainCliente {
             System.exit(1);
         }
         
-        new HiloImprimir(in).start();
         
-        String line;
-        while ((line = stdIn.readLine()) != null) {
-		    out.println(line);
-		}
 	}
 
 }
