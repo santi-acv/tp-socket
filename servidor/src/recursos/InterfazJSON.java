@@ -27,6 +27,7 @@ public class InterfazJSON {
 	
 	public int leerMensaje() throws IOException {
 		String linea;
+		tipo_operacion = -1;
 		while ((linea = in.readLine()) != null) {
 			try {
 				mensaje = new JSONObject(linea);
@@ -49,11 +50,12 @@ public class InterfazJSON {
 		return mensaje.optString("destino");
 	}
 	
-	public void enviarLlamada(InterfazJSON json) {
+	public void enviarLlamada(String nombre, InterfazJSON json) {
 		JSONObject llamada = new JSONObject();
-		llamada.put("estado", 0);
-		llamada.put("mensaje", "ok");
+		llamada.put("estado", CodigoEstado.LLAMADA_ENTRANTE.estado);
+		llamada.put("mensaje", CodigoEstado.LLAMADA_ENTRANTE.mensaje);
 		llamada.put("tipo_operacion", tipo_operacion);
+		llamada.put("origen", nombre);
 		json.out.println(llamada.toString());
 		enviarEstado(CodigoEstado.OK);
 	}
@@ -75,8 +77,12 @@ public class InterfazJSON {
 		out.println(respuesta.toString());
 	}
 	
-	public Consumer<Conexion> funcion() {
+	public Consumer<Conexion> agregarLista() {
 		lista_clientes = new JSONArray();
+		return agregar(lista_clientes);
+	}
+	
+	public static Consumer<Conexion> agregar(JSONArray lista_clientes) {
 		return conexion -> {
 			JSONObject objeto = new JSONObject();
 			objeto.put("nombre", conexion.nombre);
@@ -85,7 +91,6 @@ public class InterfazJSON {
 			objeto.put("disponible", conexion.estado == Estado.IDLE);
 			lista_clientes.put(objeto);
 		};
-		
 	}
 
 	public void enviarLista() {
@@ -95,7 +100,7 @@ public class InterfazJSON {
 		respuesta.put("tipo_operacion", tipo_operacion);
 		respuesta.put("lista_clientes", lista_clientes);
 		out.println(respuesta.toString());
-		
+		lista_clientes = null;
 	}
 
 	public void cerrar() throws IOException {

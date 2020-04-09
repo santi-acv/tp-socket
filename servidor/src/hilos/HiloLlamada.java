@@ -36,10 +36,12 @@ public class HiloLlamada extends Thread {
 					destino.estado.equals(Estado.RING)) {
 					origen.reiniciar();
 					destino.reiniciar();
-					origen.json.enviarEstado(CodigoEstado.NO_CONTESTA);
-					destino.json.enviarEstado(CodigoEstado.NO_CONTESTA);
+				} else {
+					return;
 				}
 			}
 		}
+		origen.json.enviarEstado(CodigoEstado.NO_CONTESTA);
+		destino.json.enviarEstado(CodigoEstado.NO_CONTESTA);
 	}
 }

@@ -70,7 +70,7 @@ Todos los mensajes provenientes de un cliente deben tener el atributo `tipo_oper
 | Realizar llamada   |  2             | TCP       | destino            |
 | Enviar mensaje     |  3             | TCP       | cuerpo             |
 | Terminar llamada   |  4             | TCP / UDP |                    |
-| Contestar llamada  |  5             | TCP       |                    |
+| Contestar llamada  |  5             | TCP       | origen (UDP)       |
 
 Las respuestas del servidor siempre poseen los atributos `estado` y `mensaje` describiendo el resultado de la operación. Si la operación fue exitosa estos contienen el número 0 y la cadena `ok`; de caso contrario contienen un código de error y una descripción del error.
 

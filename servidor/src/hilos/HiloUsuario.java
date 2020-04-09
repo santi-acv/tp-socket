@@ -39,6 +39,7 @@ public class HiloUsuario extends Thread {
             	
             	// cerrar sesion
             	case -1:
+            		Registro.tabla.remove(nombre);
             		json.enviarEstado(CodigoEstado.OK);
             		json.cerrar();
             		socket.close();
@@ -57,7 +58,7 @@ public class HiloUsuario extends Thread {
             	
             	// ver clientes conectados
             	case 1:
-            		Registro.tabla.forEachValue(1, json.funcion());
+            		Registro.tabla.forEachValue(1, json.agregarLista());
             		json.enviarLista();
             		break;
             	
@@ -65,16 +66,16 @@ public class HiloUsuario extends Thread {
             	case 2:
             		Conexion destino;
         			HiloLlamada hilo;
-            		if (!conexion.estado.equals(Estado.IDLE)) {
+            		if (conexion.estado != Estado.IDLE) {
             			json.enviarEstado(CodigoEstado.ORIGEN_OCUPADO);
             		} else if ((nombre = json.obtenerDestino()) == null) {
             			json.enviarEstado(CodigoEstado.FALTA_DESTINO);
             		} else if ((destino = Registro.tabla.get(nombre)) == null) {
-            			json.enviarEstado(CodigoEstado.DESTINO_INVALIDO);
+            			json.enviarEstado(CodigoEstado.USUARIO_INVALIDO);
             		} else if ((hilo = Registro.establecerLlamada(conexion, destino)) == null) {
             			json.enviarEstado(CodigoEstado.DESTINO_OCUPADO);
             		} else {
-            			json.enviarLlamada(enlace.json);
+            			json.enviarLlamada(conexion.nombre, enlace.json);
                     	hilo.start();
             		}
             		break;
@@ -94,6 +95,7 @@ public class HiloUsuario extends Thread {
             	case 4:
             		if (enlace != null && Registro.terminarLlamada(conexion, enlace)) {
             			json.enviarEstado(CodigoEstado.OK);
+            			enlace.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA);
             		} else {
             			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
@@ -103,11 +105,13 @@ public class HiloUsuario extends Thread {
             	case 5:
             		if (Registro.contestarLLamada(enlace, conexion)) {
             			json.enviarEstado(CodigoEstado.OK);
+            			enlace.json.enviarEstado(CodigoEstado.OK);
             		} else {
             			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
             		break;
             	
+            	// operacion indeterminada
             	default:
             		json.enviarEstado(CodigoEstado.TIPO_INVALIDO);
             		break;

@@ -34,12 +34,12 @@ public class Registro {
 					destino.estado = Estado.RING;
 					origen.hilo.enlace = destino;
 					destino.hilo.enlace = origen;
-					return new HiloLlamada(origen, destino);
 				} else {
 					return null;
 				}
 			}
 		}
+		return new HiloLlamada(origen, destino);
 	}
 	
 	public static boolean contestarLLamada(Conexion origen, Conexion destino) {
