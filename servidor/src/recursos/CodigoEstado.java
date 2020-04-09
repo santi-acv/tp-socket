@@ -5,8 +5,8 @@ public enum CodigoEstado {
 	OK               (0, "ok"),
 	LLAMADA_ENTRANTE (1, "Está recibiendo una llamada."),
 	LLAMADA_CORTADA  (2, "El otro cliente ha terminado la llamada."),
-	UDP_FIN_LLAMADA  (3, "La llamada se ha cortado por el canal UDP."),
-	NO_CONTESTA	     (4, "La llamada no fue contestada a tiempo."),
+	NO_CONTESTA	     (3, "La llamada no fue contestada a tiempo."),
+	UDP_FIN_LLAMADA  (4, "La llamada se ha cortado por el canal UDP."),
 	
 	// operacion invalida
 	ORIGEN_OCUPADO	 (5, "El usuario ya se encuentra en una llamada."),

@@ -56,7 +56,7 @@ El servidor provee los siguientes servicios a través de su API:
 * Envío de mensajes
 * Fin de la llamada
 
-Estos se implementan mediante el intercambio de objetos JSON a través del protocolo TCP, aunque algunos servicios también están disponibles sobre UDP. A cada solicitud del cliente corresponde una respuesta del servidor indicando el estado del servicio.
+Estos se implementan mediante el intercambio de objetos JSON a través de una conexión TCP, aunque algunos servicios también están disponibles sobre UDP. A cada solicitud del cliente corresponde una respuesta del servidor indicando el estado del servicio. Para conectarse al servidor, un cliente debe ser capaz de establecer una conexión y contestar las llamadas entrantes.
 
 Cada mensaje se representa por un objeto JSON y este debe abarcar exactamente una línea—en otras palabras, debe haber un fin de línea entre cada mensaje y una línea no puede terminar dentro de un mismo mensaje. El fin de una línea puede ser representado por un salto de línea (`\n`), un retorno de carro (`\r`), o un retorno de carro inmediatamente seguido de un salto de línea (`\r\n`).
 
@@ -72,32 +72,183 @@ Todos los mensajes provenientes de un cliente deben tener el atributo `tipo_oper
 | Terminar llamada   |  4             | TCP / UDP |                    |
 | Contestar llamada  |  5             | TCP       | origen (UDP)       |
 
-Las respuestas del servidor siempre poseen los atributos `estado` y `mensaje` describiendo el resultado de la operación. Si la operación fue exitosa estos contienen el número 0 y la cadena `ok`; de caso contrario contienen un código de error y una descripción del error.
+Los mensajes provenientes del servidor siempre también poseen el atributo `tipo_operacion` y además incluyen los atributos `estado` (entero) y `mensaje` (cadena) describiendo el resultado de la operación. El número 0 indica una transación exitosa, el número 1 representa una llamada entrante, y los otros números representan errores. En cada caso se incluye un descripción del estado. La siguiente tabla resume los diferentes tipos de mensaje, los cuales están definidos en el archivo `servidor/src/servidor/CodigoEstado.java`.
 
-| estado | Significado                                     |
-| ------ | ----------------------------------------------- |
-| -2     | El mensaje no representa un objeto JSON válido. |
-| -1     | No existe ninguna operación con ese código.     |
-|  0     | Operación exitosa, no ocurrió ningún error.     |
-|  1     | Falta un atributo adicional en el mensaje.      |
-| >1     | Depende de la operación solicitada.             |
+| estado  | Significado                                  |
+| ------- | -------------------------------------------- |
+| < -1    | El mensaje no está correctamente formateado. |
+|   -1    | No existe una operación con ese código.      |
+|    0    | Operación exitosa, no ocurrió ningún error.  |
+|    1    | El usuario está recibiendo una llamada.      |
+|    2    | La llamada ha sido cortada.                  |
+|    3    | La llamada no ha sido contestada.            |
+|    4    | La llamada fue cortada con un datagrama UDP. |
+|  > 4    | La operación no se ha podido realizar.       |
 
-A continuación se detalla cada operación y se incluye un ejemplo del mensaje que debe enviar el cliente.
+A continuación se detalla cada operación y se incluye un ejemplo del mensaje que debe enviar el cliente. Estos mensajes deben ser enviados en una línea pero aquí se exponen en varias líneas para facilitar su lectura.
 
 
-Lista de clientes
+Cambiar de nombre
 -----------------
 
+```
+{
+    "tipo_operacion":0,
+    "nombre":"cliente 1"
+}
+```
 
-Inicio de llamada
------------------
+Solicita al servidor un cambio de nombre. Sin realizar esta operación, el usuario es asignado por defecto una cadena que representa la dirección del socket TCP desde el cual se está conectando. El mensaje debe contener el atributo `nombre` indicando el nombre a ser utilizado y no debe estar en uso por otro usuario. El servidor puede enviar las siguientes respuestas:
+
+| estado | Significado                          |
+| ------ | ------------------------------------ |
+|    0   | El nombre fue cambiado con éxito.    |
+|    9   | Ya existe un usuario con ese nombre. |
+|   -4   | Falta el campo `nombre`.             |
 
 
-Envío de mensajes
------------------
+Listar clientes
+---------------
+
+```
+{
+    "tipo_operacion":1
+}
+```
+
+Solicita una lista de usuarios conectados al servidor. El servidor debe responder a la solicitud con un mensaje que posea el atributo `lista_clientes`, el cual consiste en un arreglo JSON donde cada objeto representa un cliente. Estos objetos deben poseer los siguientes atributos: `nombre`, una cadena por la cual se identifica cada cliente; `disponible`, un booleano indicando si el cliente puede recibir llamadas; `ip` y `puerto`, indicando la dirección del socket TCP del cliente. Una posible respuesta del servidor es la siguiente:
+
+```
+{
+    "tipo_operacion":1,
+    "estado":0,
+    "mensaje":"ok",
+    "lista_clientes":[
+        {
+            "nombre": "cliente 1",
+            "ip":"/192.168.100.2",
+            "puerto":56184,
+            "disponible":true
+        },
+        {
+            "nombre": "cliente 2",
+            "ip":"/192.168.100.3",
+            "puerto":43497,
+            "disponible":true
+        }
+    ]
+}
+```
 
 
-Fin de la llamada
------------------
+Iniciar llamada
+---------------
+
+```
+{
+    "tipo_operacion":2,
+    "destino":"cliente 2"
+}
+```
+
+Realiza una llamada a otro cliente. Este  debe aceptar o rechazar la llamada, y si no lo hace esta se cancelará automáticamente después de 10 segundos. Ninguno de los clientes se debe encontrar en una llamada para realizar esta operación. El mensaje iniciando la llamada debe tener el atributo `destino` indicando el destino y el mensaje que llegará al otro cliente tendrá el atributo `origen` indicando el origen con el `estado` igual a 1. A continuación se muestra un ejemplo:
+
+```
+{
+    "tipo_operacion":2,
+    "estado":1,
+    "mensaje":"ok",
+    "origen":"cliente 1"
+}
+```
+
+El servidor puede enviar las siguientes respuestas al emisor de la llamada. Si el emisor corta la llamada antes de que esta sea contestada o si esta no es contestada a tiempo, el receptor recibirá el mismo código.
+
+| estado | Significado                         |
+| ------ | ----------------------------------- |
+|    0   | El cliente contestó la llamada.     |
+|    2   | El cliente rechazó la llamada.      |
+|    3   | El cliente no contestó la llamada.  |
+|    5   | El cliente de origen está ocupado.  |
+|    6   | El cliente de destino está ocupado. |
+|    8   | No existe el usuario seleccionado.  |
+|   -7   | Falta el campo `destino`.           |
 
 
+Contestar llamada
+----------------
+
+```
+{
+    "tipo_operacion":5
+}
+```
+
+Contesta la llamada entrante, si esta existe. Esta llamada puede ser rechazada con la operación terminar llamada.
+
+| estado | Significado                 |
+| ------ | --------------------------- |
+|    0   | Una llamada fue contestada. |
+|    7   | No existe ninguna llamada.  |
+
+
+Terminar llamada
+----------------
+
+```
+{
+    "tipo_operacion":4
+}
+```
+
+Corta la llamada en la que se encuentra el cliente, ya sea una entrante o una en transcurso.
+
+| estado | Significado                |
+| ------ | -------------------------- |
+|    0   | La llamada fue cortada.    |
+|    7   | No existe ninguna llamada. |
+
+El otro cliente recibe un mensaje indicando que la llamada fue cortada.
+
+| estado | Significado                                 |
+| ------ | ------------------------------------------- |
+|    2   | La llamada fue cortada por el otro cliente. |
+
+-----
+
+Esta operación puede realizarse mediante un datagrama UDP, pero debe contener el campo `origen` indicando el nombre del cliente y la IP debe ser la misma que la del socket TCP.
+
+```
+{
+    "tipo_operacion":4,
+    "origen":"cliente 1"
+}
+```
+
+El resultado de la operación es enviado al mismo socket que envió el datagrama, y si tiene éxito el socket TCP recibe un mensaje con `estado` igual a 4. El otro cliente es notificado de manera normal.
+
+| estado | Significado                         |
+| ------ | ----------------------------------- |
+|    0   | El datagrama ha cortado la llamada. |
+|    4   | Un datagrama ha cortado la llamada. |
+|    8   | No existe un usario con ese nombre. |
+|   10   | La IP del datagrama es inválida.    |
+
+
+Enviar mensaje
+--------------
+
+```
+{
+    "tipo_operacion":4,
+    "cuerpo":"hola, mundo!"
+}
+```
+
+Envía un mensaje a otro cliente. El cuerpo del mensaje debe estar contenido en el campo `cuerpo`, y ambos usuarios deben encontrarse en una llamada.
+
+| estado | Significado                         |
+| ------ | ----------------------------------- |
+|    0   | El servidor ha recibido el mensaje. |
+|    7   | No se encuentra en ninguna llamada. |
+|   -5   | Falta el campo `cuerpo`.            |

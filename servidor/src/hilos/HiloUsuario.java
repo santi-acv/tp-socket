@@ -39,6 +39,8 @@ public class HiloUsuario extends Thread {
             	
             	// cerrar sesion
             	case -1:
+            		if (enlace != null)
+            			Registro.terminarLlamada(conexion, enlace);
             		Registro.tabla.remove(nombre);
             		json.enviarEstado(CodigoEstado.OK);
             		json.cerrar();
@@ -93,9 +95,10 @@ public class HiloUsuario extends Thread {
             	
             	// terminar llamada
             	case 4:
+            		destino = enlace;
             		if (enlace != null && Registro.terminarLlamada(conexion, enlace)) {
             			json.enviarEstado(CodigoEstado.OK);
-            			enlace.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA);
+            			destino.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA, 4);
             		} else {
             			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
@@ -105,7 +108,7 @@ public class HiloUsuario extends Thread {
             	case 5:
             		if (Registro.contestarLLamada(enlace, conexion)) {
             			json.enviarEstado(CodigoEstado.OK);
-            			enlace.json.enviarEstado(CodigoEstado.OK);
+            			enlace.json.enviarEstado(CodigoEstado.OK, 5);
             		} else {
             			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}

@@ -57,7 +57,6 @@ public class InterfazJSON {
 		llamada.put("tipo_operacion", tipo_operacion);
 		llamada.put("origen", nombre);
 		json.out.println(llamada.toString());
-		enviarEstado(CodigoEstado.OK);
 	}
 
 	public void redirigirMensaje(InterfazJSON json) {
@@ -69,12 +68,16 @@ public class InterfazJSON {
 		}
 	}
 	
-	public void enviarEstado(CodigoEstado codigo) {
+	public void enviarEstado(CodigoEstado codigo, int tipo_operacion) {
 		JSONObject respuesta = new JSONObject();
 		respuesta.put("estado", codigo.estado);
 		respuesta.put("mensaje", codigo.mensaje);
 		respuesta.put("tipo_operacion", tipo_operacion);
 		out.println(respuesta.toString());
+	}
+	
+	public void enviarEstado(CodigoEstado codigo) {
+		enviarEstado(codigo, tipo_operacion);
 	}
 	
 	public Consumer<Conexion> agregarLista() {
