@@ -102,7 +102,7 @@ public class HiloUsuario extends Thread {
             	
             	// contestar llamada
             	case 5:
-            		if (Registro.contestarLLamada(enlace, conexion)) {
+            		if (enlace != null && Registro.contestarLLamada(enlace, conexion)) {
             			json.enviarEstado(CodigoEstado.OK);
             			enlace.json.enviarEstado(CodigoEstado.OK, 5);
             		} else {

@@ -16,9 +16,10 @@ public class Registro {
 			} else if (tabla.putIfAbsent(nombre, conexion) != null) {
 				return CodigoEstado.NOMBRE_DUPLICADO;
 			} else {
-				tabla.remove(conexion.nombre);
+				String nombre_viejo = conexion.nombre;
 				conexion.nombre = nombre;
-    			BaseDatos.cambioNombre(conexion);
+    			BaseDatos.cambioNombre(conexion, nombre_viejo);
+				tabla.remove(nombre_viejo);
 				return CodigoEstado.OK;
 			}
 		}

@@ -12,10 +12,13 @@ CREATE TABLE conexiones (
     fin     timestamp
 );
 
-CREATE TABLE cambios_de_nombre (
+CREATE TABLE nombres (
     numero  serial      PRIMARY KEY,
     tiempo  timestamp   NOT NULL,
-    cliente usuario     NOT NULL
+    viejo   varchar(20) NOT NULL,
+    nuevo   varchar(20) NOT NULL,
+    dir_ip  varchar(16) NOT NULL,
+    puerto integer      NOT NULL
 );
 
 CREATE TABLE llamadas (

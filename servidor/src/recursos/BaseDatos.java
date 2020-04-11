@@ -23,56 +23,51 @@ public class BaseDatos {
     private static PreparedStatement terminarLlamada;
 
     public static void iniciar() {
-    	try {
-    		conn = DriverManager.getConnection(url, user, password);
-    	} catch (SQLException ex) {
-    		System.err.println("No se ha podido conectar a la base de datos.");
-    		System.err.println(ex.getMessage());
-    		return;
-    	}
-    	try {
-    		insertarConexion = conn.prepareStatement(
-    				"INSERT INTO conexiones (dir_ip, puerto, inicio)"
-    				+ "VALUES (?,?,?);", Statement.RETURN_GENERATED_KEYS);
-    		terminarConexion = conn.prepareStatement(
-    				"UPDATE conexiones SET fin = ? "
-    				+ "WHERE numero = ("
-    					+ "SELECT max(numero) "
-    					+ "FROM conexiones "
-    					+ "WHERE dir_ip = ? AND puerto = ?)");
-    		cambiarNombre = conn.prepareStatement(
-    				"INSERT INTO cambios_de_nombre (tiempo, cliente)"
-    				+ "VALUES (?,ROW(?,?,?)::usuario);");
-    		insertarLlamada = conn.prepareStatement(
-    				"INSERT INTO llamadas (origen, destino, inicio)"
-    				+ "VALUES (ROW(?,?,?)::usuario, ROW(?,?,?)::usuario, ?);",
-    				Statement.RETURN_GENERATED_KEYS);
-    		contestarLlamada = conn.prepareStatement(
-    				"UPDATE llamadas SET contestada = ? "
-    				+ "WHERE numero = ?;");
-    		terminarLlamada = conn.prepareStatement(
-    				"UPDATE llamadas SET terminada = ? "
-    				+ "WHERE numero = ?;");
-    	} catch (SQLException ex) {
-    		System.err.println("No se han podido preparar las declaraciones.");
-    		System.err.println(ex.getMessage());
-    		cerrar();
-    		return;
-    	}
+    	synchronized (BaseDatos.class) {
+			try {
+				conn = DriverManager.getConnection(url, user, password);
+			} catch (SQLException ex) {
+				System.err.println("No se ha podido conectar a la base de datos.");
+				System.err.println(ex.getMessage());
+				return;
+			}
+			try {
+				insertarConexion = conn.prepareStatement(
+						"INSERT INTO conexiones (dir_ip, puerto, inicio)" + "VALUES (?,?,?);",
+						Statement.RETURN_GENERATED_KEYS);
+				terminarConexion = conn.prepareStatement("UPDATE conexiones SET fin = ? " + "WHERE numero = ("
+						+ "SELECT max(numero) " + "FROM conexiones " + "WHERE dir_ip = ? AND puerto = ?)");
+				cambiarNombre = conn.prepareStatement(
+						"INSERT INTO nombres (tiempo, viejo, nuevo, dir_ip, puerto)" + "VALUES (?,?,?,?,?);");
+				insertarLlamada = conn.prepareStatement(
+						"INSERT INTO llamadas (origen, destino, inicio)"
+								+ "VALUES (ROW(?,?,?)::usuario, ROW(?,?,?)::usuario, ?);",
+						Statement.RETURN_GENERATED_KEYS);
+				contestarLlamada = conn.prepareStatement("UPDATE llamadas SET contestada = ? " + "WHERE numero = ?;");
+				terminarLlamada = conn.prepareStatement("UPDATE llamadas SET terminada = ? " + "WHERE numero = ?;");
+			} catch (SQLException ex) {
+				System.err.println("No se han podido preparar las declaraciones.");
+				System.err.println(ex.getMessage());
+				cerrar();
+				return;
+			}
+		}
     }
 
 	public static int inicioConexion(String ip, int puerto) {
     	if (conn == null)
     		return 0;
     	try {
-    		PreparedStatement ps = insertarConexion;
-    		ps.setString	(1, ip);
-    		ps.setInt		(2, puerto);
-    		ps.setTimestamp	(3, new Timestamp(System.currentTimeMillis()));
-    		ps.executeUpdate();
-    		ResultSet rs = ps.getGeneratedKeys();
-    		rs.next();
-    		return rs.getInt(1);
+    		synchronized (BaseDatos.class) {
+				PreparedStatement ps = insertarConexion;
+				ps.setString(1, ip);
+				ps.setInt(2, puerto);
+				ps.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+				ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				rs.next();
+				return rs.getInt(1);
+			}
 		} catch (SQLException ex) {
 			System.err.println("Base de datos: Error registrando la conexión.");
 			System.err.println(ex.getMessage());
@@ -81,28 +76,35 @@ public class BaseDatos {
 	}
 
 	public static void finConexion(Conexion cliente) {
+		if (conn == null)
+			return;
 		try {
-    		PreparedStatement ps = terminarConexion;
-    		ps.setTimestamp	(1, new Timestamp(System.currentTimeMillis()));
-    		ps.setString	(2, cliente.ip.toString());
-    		ps.setInt		(3, cliente.puerto);
-    		ps.executeUpdate();
+    		synchronized (BaseDatos.class) {
+				PreparedStatement ps = terminarConexion;
+				ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+				ps.setString(2, cliente.ip.toString());
+				ps.setInt(3, cliente.puerto);
+				ps.executeUpdate();
+			}
 		} catch (SQLException ex) {
 			System.err.println("Base de datos: Error registrando la desconexión.");
 			System.err.println(ex.getMessage());
 		}
 	}
 
-	public static void cambioNombre(Conexion cliente) {
+	public static void cambioNombre(Conexion cliente, String nombre_viejo) {
 		if (conn == null)
     		return;
     	try {
-    		PreparedStatement ps = cambiarNombre;
-    		ps.setTimestamp	(1, new Timestamp(System.currentTimeMillis()));
-    		ps.setString	(2, cliente.nombre);
-    		ps.setString	(3, cliente.ip.toString());
-    		ps.setInt		(4, cliente.puerto);
-    		ps.executeUpdate();
+    		synchronized (BaseDatos.class) {
+				PreparedStatement ps = cambiarNombre;
+				ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+				ps.setString(2, nombre_viejo);
+				ps.setString(3, cliente.nombre);
+				ps.setString(4, cliente.ip.toString());
+				ps.setInt(5, cliente.puerto);
+				ps.executeUpdate();
+			}
 		} catch (SQLException ex) {
 			System.err.println("Base de datos: Error registrando el cambio de nombre.");
 			System.err.println(ex.getMessage());
@@ -113,18 +115,20 @@ public class BaseDatos {
     	if (conn == null)
     		return 0;
     	try {
-    		PreparedStatement ps = insertarLlamada;
-    		ps.setString	(1, origen.nombre);
-    		ps.setString	(2, origen.ip.toString());
-    		ps.setInt   	(3, origen.puerto);
-    		ps.setString	(4, destino.nombre);
-    		ps.setString	(5, destino.ip.toString());
-    		ps.setInt		(6, destino.puerto);
-    		ps.setTimestamp	(7, new Timestamp(System.currentTimeMillis()));
-    		ps.executeUpdate();
-    		ResultSet rs = ps.getGeneratedKeys();
-    		rs.next();
-    		return rs.getInt(1);
+    		synchronized (BaseDatos.class) {
+				PreparedStatement ps = insertarLlamada;
+				ps.setString(1, origen.nombre);
+				ps.setString(2, origen.ip.toString());
+				ps.setInt(3, origen.puerto);
+				ps.setString(4, destino.nombre);
+				ps.setString(5, destino.ip.toString());
+				ps.setInt(6, destino.puerto);
+				ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+				ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				rs.next();
+				return rs.getInt(1);
+			}
 		} catch (SQLException ex) {
 			System.err.println("Base de datos: Error registrando el intento de llamada.");
 			System.err.println(ex.getMessage());
@@ -136,10 +140,12 @@ public class BaseDatos {
 		if (conn == null)
     		return;
     	try {
-    		PreparedStatement ps = contestarLlamada;
-    		ps.setTimestamp	(1, new Timestamp(System.currentTimeMillis()));
-    		ps.setInt		(2, id_llamada);
-    		ps.executeUpdate();
+    		synchronized (BaseDatos.class) {
+				PreparedStatement ps = contestarLlamada;
+				ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+				ps.setInt(2, id_llamada);
+				ps.executeUpdate();
+			}
 		} catch (SQLException ex) {
 			System.err.println("Base de datos: Error registrando el inicio de la llamada.");
 			System.err.println(ex.getMessage());
@@ -150,10 +156,12 @@ public class BaseDatos {
 		if (conn == null)
     		return;
     	try {
-    		PreparedStatement ps = terminarLlamada;
-    		ps.setTimestamp	(1, new Timestamp(System.currentTimeMillis()));
-    		ps.setInt		(2, id_llamada);
-    		ps.executeUpdate();
+    		synchronized (BaseDatos.class) {
+				PreparedStatement ps = terminarLlamada;
+				ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+				ps.setInt(2, id_llamada);
+				ps.executeUpdate();
+			}
 		} catch (SQLException ex) {
 			System.err.println("Base de datos: Error registrando el inicio de la llamada.");
 			System.err.println(ex.getMessage());
@@ -161,12 +169,14 @@ public class BaseDatos {
 	}
     
     public static void cerrar() {
-    	try {
-			conn.close();
-		} catch (SQLException ex) {
-			System.err.println("No se ha podido cerrar la conexión a la base de datos.");
-    		System.err.println(ex.getMessage());
+    	synchronized (BaseDatos.class) {
+			try {
+				conn.close();
+			} catch (SQLException ex) {
+				System.err.println("No se ha podido cerrar la conexión a la base de datos.");
+				System.err.println(ex.getMessage());
+			}
+			conn = null;
 		}
-    	conn = null;
     }
 }
