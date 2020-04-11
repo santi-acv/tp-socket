@@ -1,5 +1,5 @@
 //package cliente;
-
+import javax.swing.JOptionPane;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -224,13 +224,117 @@ public class ClienteGUIMain extends JFrame {
 		
 		public void run() {
 			String line;
+			
+			String parts[]=null;
+			String dobleSplit[]=null;
+
+			
 			try {
 				while ((line = in.readLine()) != null) {
 				    //Append a la pantalla lo que se desea mostrar, line es el json que recibe del servidor TODO: Hacer que se imprima todo ya
-					//procesado el json
-					pantalla.append(line);
-					//pantalla.append(line);
-					pantalla.append("\n");
+					
+
+
+					char operacion=line.charAt(line.length()-2);//obtengo numero operacion
+
+
+					if(line.charAt(line.length()-3)=='-'){//desconectar
+						operacion='9';
+					}
+
+
+					switch(operacion){
+
+						case'0'://nombre
+
+							parts=line.split(",");
+							dobleSplit=parts[0].split(":");
+							if(dobleSplit[1].equalsIgnoreCase("0")){	
+								JOptionPane.showMessageDialog(null, "Nombre cambiado correctamente");
+							}else{
+								dobleSplit=parts[1].split(":");
+								JOptionPane.showMessageDialog(null, dobleSplit[1]);
+							}
+							break;	
+						case'1'://lista
+					    	parts=line.split(",");
+					    	
+							pantalla.append("PUERTO"+"         "+"IP"+"                   "+"NOMBRE"+ "             "+"DISPONIBLE\n");
+							
+							
+							String disponible[];
+							String nombre[];
+							String ip[];
+							String puerto[];
+							
+							for(int c=2;c<parts.length; c++) {
+								
+							    disponible=parts[c+3].split(":");
+								nombre=parts[c+2].split("/");
+								ip=parts[c+1].split("/");
+								puerto=parts[c].split(":");
+								pantalla.append(puerto[2]+"      "+ip[1].substring(0, ip[1].length()-1)+"       "+nombre[1].substring(0, nombre[1].length()-1)+"            "+disponible[1].substring(0, disponible[1].length()-2)+"\n");
+								c=c+4;
+							}
+							
+
+							break;
+						
+						case'2'://realizar
+							parts=line.split(",");
+							dobleSplit=parts[0].split(":");
+							if(dobleSplit[1].equalsIgnoreCase("0")){	
+								pantalla.append("***REALIZANDO LLAMADA, FAVOR ESPERE***");
+								pantalla.append("\n");
+							}else{
+								dobleSplit=parts[1].split(":");
+								JOptionPane.showMessageDialog(null, dobleSplit[1]);
+							}
+							break;
+						case'3'://mensaje
+							parts=line.split(",");
+							if(parts.length==2){	
+								dobleSplit=parts[0].split(":");	
+								pantalla.append(dobleSplit[1]);
+								pantalla.append("\n");
+							}else{
+								dobleSplit=parts[1].split(":");
+								JOptionPane.showMessageDialog(null, dobleSplit[1]);
+							}
+							break;
+						case'4'://terminar
+
+							parts=line.split(",");
+							dobleSplit=parts[0].split(":");
+							if(dobleSplit[1].equalsIgnoreCase("0")){	
+								pantalla.append("---LLAMADA TERMINADA---");
+								pantalla.append("\n");
+							}else{
+								dobleSplit=parts[1].split(":");
+								JOptionPane.showMessageDialog(null, dobleSplit[1]);
+							}
+							break;
+						case'5'://contestar
+							parts=line.split(",");
+							dobleSplit=parts[0].split(":");
+							if(!dobleSplit[1].equalsIgnoreCase("7")){	
+								pantalla.append("<<<LLAMADA CONTESTADA, PUEDE CONVERSAR>>>");
+								pantalla.append("\n");
+							}else{
+								dobleSplit=parts[1].split(":");
+								JOptionPane.showMessageDialog(null, dobleSplit[1]);
+							}
+							break;
+						case'9':
+							JOptionPane.showMessageDialog(null, "Se ha Desconectado");//funciona todo
+							break;
+
+					}
+					
+				
+					
+					
+					
 					pantalla.setCaretPosition(pantalla.getDocument().getLength());
 				}
 			} catch (IOException e) {
