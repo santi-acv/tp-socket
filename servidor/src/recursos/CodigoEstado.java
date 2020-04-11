@@ -7,9 +7,10 @@ public enum CodigoEstado {
 	LLAMADA_CORTADA  (2, "El otro cliente ha terminado la llamada."),
 	NO_CONTESTA	     (3, "La llamada no fue contestada a tiempo."),
 	UDP_FIN_LLAMADA  (4, "La llamada se ha cortado por el canal UDP."),
+	CAMBIO_NOMBRE   (11, "El cliente conectado ha cambiado su nobre."),
 	
 	// operacion invalida
-	ORIGEN_OCUPADO	 (5, "El usuario ya se encuentra en una llamada."),
+	ORIGEN_OCUPADO	 (5, "El usuario se encuentra ocupado."),
 	DESTINO_OCUPADO  (6, "El destino de la llamada está ocupado."),
 	NO_HAY_LLAMADA   (7, "El usuario no se encuentra en una llamada."),
 	USUARIO_INVALIDO (8, "No existe un usuario con ese nombre."),
@@ -24,10 +25,7 @@ public enum CodigoEstado {
 	FALTA_CUERPO    (-5, "El campo \"cuerpo\" está ausente."),
 	FALTA_ORIGEN    (-6, "El campo \"origen\" está ausente."),
 	FALTA_DESTINO   (-7, "El campo \"destino\" está ausente."),
-	;
-	
-	// contestar o cortar
-		
+	;		
 	public final int estado;
 	public final String mensaje;
 	

@@ -1,5 +1,7 @@
 package hilos;
 
+import recursos.BaseDatos;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.DatagramSocket;
@@ -12,6 +14,7 @@ public class MainServidor {
 		int puerto = 0;
 		ServerSocket socketTCP = null;
 		DatagramSocket socketUDP = null;
+		BaseDatos.iniciar();
 		
 		// crea un socket servidor TCP
 		try {

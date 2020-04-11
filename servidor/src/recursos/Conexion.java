@@ -4,6 +4,7 @@ import hilos.HiloLlamada;
 import hilos.HiloUsuario;
 
 import java.net.Socket;
+import java.io.IOException;
 import java.net.InetAddress;
 
 public class Conexion {
@@ -22,6 +23,8 @@ public class Conexion {
 	public InetAddress ip;
 	public int puerto;
 	private int pl;
+	protected int id_cliente;
+	protected int id_llamada;
 	
 	public Conexion(String nombre, HiloUsuario hilo, InterfazJSON json, Socket socket) {
 		
@@ -34,6 +37,8 @@ public class Conexion {
 		this.ip = socket.getInetAddress();
 		this.puerto = socket.getPort();
 		this.pl = socket.getLocalPort();
+		
+		this.id_cliente = BaseDatos.inicioConexion(ip.toString(), puerto);
 	}
 	
 	public void reiniciar() {
@@ -44,5 +49,10 @@ public class Conexion {
 	
 	public int compareTo(Conexion other) {
 		return this.pl - other.pl;
+	}
+
+	public void cerrar() throws IOException {
+		BaseDatos.finConexion(this);
+		json.cerrar();
 	}
 }

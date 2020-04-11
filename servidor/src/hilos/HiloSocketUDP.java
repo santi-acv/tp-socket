@@ -83,8 +83,8 @@ public class HiloSocketUDP extends Thread {
 						estado = CodigoEstado.IP_INVALIDA;
 					} else if ((destino = origen.hilo.enlace) != null &&
 						Registro.terminarLlamada(origen, destino)) {
-						origen.json.enviarEstado(CodigoEstado.UDP_FIN_LLAMADA);
-						destino.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA);
+						origen.json.enviarEstado(CodigoEstado.UDP_FIN_LLAMADA, 4);
+						destino.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA, 4);
 					} else {
 						estado = CodigoEstado.NO_HAY_LLAMADA;
 					}

@@ -25,17 +25,17 @@ Requerimientos
 Configuración de la base de datos
 ---------------------------------
 
-El servidor de base de datos PostgreSQL debe ejecutarse localmente y debe tener las siguientes propiedades:
+El servidor utiliza una base de datos PostgreSQL para almacenar historiales de conexiones y llamadas. Esta debe ejecutarse localmente y debe tener las siguientes propiedades:
 
 ```
 Host: localhost
 Puerto: 5432
-Nombre: sd
+Nombre: tp-socket
 Usuario: postgres
 Contraseña: postgres
 ```
 
-Estos se pueden modifical mediante el archivo `servidor/src/servidor/BaseDatos.java`. Para crear la tabla correspondiente, el servidor debe ejecutar el archivo `crear_tabla.sql`.
+En caso de que se utilice una base de datos remota, estas propeidades se pueden modificar en el archivo `servidor/src/servidor/BaseDatos.java`. Para crear las tablas correspondientes, la base de datos debe ejecutar el archivo `basedatos/crear_tablas.sql`. Para vaciar o eliminar las tablas de la base de datos se pueden utilizar los archivos `basedatos/vaciar_historial.sql` o `basedatos/eliminar_tablas.sql` respectivamente.
 
 
 Compilación y ejecución del servidor
@@ -98,11 +98,12 @@ Cambiar de nombre
 }
 ```
 
-Solicita al servidor un cambio de nombre. Sin realizar esta operación, el usuario es asignado por defecto una cadena que representa la dirección del socket TCP desde el cual se está conectando. El mensaje debe contener el atributo `nombre` indicando el nombre a ser utilizado y no debe estar en uso por otro usuario. El servidor puede enviar las siguientes respuestas:
+Solicita al servidor un cambio de nombre. Sin realizar esta operación, el usuario es asignado por defecto una cadena que representa la dirección del socket TCP desde el cual se está conectando. El mensaje debe contener el atributo `nombre` indicando el nombre a ser utilizado y no debe estar en uso por otro usuario. El cliente no debe estar en una llamada durante esta operación. El servidor puede enviar las siguientes respuestas:
 
 | estado | Significado                          |
 | ------ | ------------------------------------ |
 |    0   | El nombre fue cambiado con éxito.    |
+|    5   | El cliente está en una llamada.      |
 |    9   | Ya existe un usuario con ese nombre. |
 |   -4   | Falta el campo `nombre`.             |
 

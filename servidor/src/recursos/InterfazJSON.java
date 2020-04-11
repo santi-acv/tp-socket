@@ -43,7 +43,10 @@ public class InterfazJSON {
 	}
 
 	public String obtenerNombre() {
-		return mensaje.optString("nombre");
+		String nombre = mensaje.optString("nombre");
+		if (nombre == null)
+			enviarEstado(CodigoEstado.FALTA_NOMBRE);
+		return nombre;
 	}
 
 	public String obtenerDestino() {
