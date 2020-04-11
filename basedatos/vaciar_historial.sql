@@ -1,3 +1,3 @@
 DELETE FROM conexiones;
-DELETE FROM cambios_de_nombre;
+DELETE FROM nombres;
 DELETE FROM llamadas;
