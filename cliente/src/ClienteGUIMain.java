@@ -267,16 +267,32 @@ public class ClienteGUIMain extends JFrame {
 							String ip[];
 							String puerto[];
 							
-							for(int c=2;c<parts.length; c++) {
-								
-							    disponible=parts[c+3].split(":");
-								nombre=parts[c+2].split("/");
-								ip=parts[c+1].split("/");
-								puerto=parts[c].split(":");
-								pantalla.append(puerto[2]+"      "+ip[1].substring(0, ip[1].length()-1)+"       "+nombre[1].substring(0, nombre[1].length()-1)+"            "+disponible[1].substring(0, disponible[1].length()-2)+"\n");
-								c=c+4;
-							}
 							
+							int numero;
+							
+							for(int c=2;c<(parts.length-1); ) {
+							
+							    disponible=parts[c+3].split(":");
+							    disponible=disponible[1].split("}");
+							    if(parts[c+2].contains("/"))
+							    		nombre=parts[c+2].split("/");
+							    else {
+						    		nombre=parts[c+2].split(":");
+						    		nombre[1]=nombre[1].substring(1);
+							    }
+
+								ip=parts[c+1].split("/");
+								
+								if(c==2)
+									numero=2;
+								else
+									numero=1;
+								
+								puerto=parts[c].split(":");
+								
+								pantalla.append(puerto[numero]+"      "+ip[1].substring(0, ip[1].length()-1)+"       "+nombre[1].substring(0, nombre[1].length()-1)+"            "+ disponible[0]+"\n\n");
+								c=c+4;
+							}	
 
 							break;
 						
@@ -285,7 +301,7 @@ public class ClienteGUIMain extends JFrame {
 							dobleSplit=parts[0].split(":");
 							if(dobleSplit[1].equalsIgnoreCase("0")){	
 								pantalla.append("***REALIZANDO LLAMADA, FAVOR ESPERE***");
-								pantalla.append("\n");
+								pantalla.append("\n\n");
 							}else{
 								dobleSplit=parts[1].split(":");
 								JOptionPane.showMessageDialog(null, dobleSplit[1]);
@@ -295,20 +311,20 @@ public class ClienteGUIMain extends JFrame {
 							parts=line.split(",");
 							if(parts.length==2){	
 								dobleSplit=parts[0].split(":");	
-								pantalla.append(dobleSplit[1]);
+								pantalla.append("MENSAJE RECIBIDO: " + dobleSplit[1]);
+								//NO SE DE QUIEN RECIBIO EL MENSAJE Y NO PUDE HACER QUE PASE ESO 
 								pantalla.append("\n");
-							}else{
+							}else if(parts.length!=2){
 								dobleSplit=parts[1].split(":");
-								JOptionPane.showMessageDialog(null, dobleSplit[1]);
+								JOptionPane.showMessageDialog(null,"ENVIADO");
 							}
 							break;
 						case'4'://terminar
-
 							parts=line.split(",");
 							dobleSplit=parts[0].split(":");
 							if(dobleSplit[1].equalsIgnoreCase("0")){	
 								pantalla.append("---LLAMADA TERMINADA---");
-								pantalla.append("\n");
+								pantalla.append("\n\n");
 							}else{
 								dobleSplit=parts[1].split(":");
 								JOptionPane.showMessageDialog(null, dobleSplit[1]);
@@ -318,8 +334,8 @@ public class ClienteGUIMain extends JFrame {
 							parts=line.split(",");
 							dobleSplit=parts[0].split(":");
 							if(!dobleSplit[1].equalsIgnoreCase("7")){	
-								pantalla.append("<<<LLAMADA CONTESTADA, PUEDE CONVERSAR>>>");
-								pantalla.append("\n");
+								pantalla.append("<<<LLAMADA EN LINEA, PUEDE CONVERSAR>>>");
+								pantalla.append("\n\n");
 							}else{
 								dobleSplit=parts[1].split(":");
 								JOptionPane.showMessageDialog(null, dobleSplit[1]);
