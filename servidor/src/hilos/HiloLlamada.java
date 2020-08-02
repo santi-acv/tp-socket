@@ -41,7 +41,7 @@ public class HiloLlamada extends Thread {
 				}
 			}
 		}
-		origen.json.enviarEstado(CodigoEstado.NO_CONTESTA, 2);
-		destino.json.enviarEstado(CodigoEstado.NO_CONTESTA, 2);
+		origen.json.enviarEstado(CodigoEstado.NO_CONTESTA);
+		destino.json.enviarEstado(CodigoEstado.NO_CONTESTA);
 	}
 }

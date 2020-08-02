@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import org.json.*;
@@ -15,6 +16,7 @@ public class ClienteAPI {
 	private int puerto;
 	private PrintWriter salida;
 	private BufferedReader entrada;
+	private String nombre;
 	
 	public ClienteAPI(String hostname, int puerto) throws IOException, UnknownHostException{
 		//Constructor de la API
@@ -35,6 +37,8 @@ public class ClienteAPI {
 		this.salida = new PrintWriter(this.socketCliente.getOutputStream(), true);
 		//Crea la entrada de datos (Lo que el cliente recibe del servidor)
 		this.entrada = new BufferedReader(new InputStreamReader(this.socketCliente.getInputStream()));
+		//Nombre del usuario
+		this.nombre = ((InetSocketAddress)socketCliente.getRemoteSocketAddress()).toString();
 	}
 	
 	/**
@@ -53,7 +57,6 @@ public class ClienteAPI {
 		return this.entrada;
 	}
 	
-	
 	/**
 	 *  Cierra la conexión del cliente al servidor
 	 */
@@ -71,6 +74,7 @@ public class ClienteAPI {
 	
 	public void cambiarNombre(String nuevoNombre) {
 		JSONObject mensaje = new JSONObject();
+		nombre = nuevoNombre;
 		mensaje.put("nombre", nuevoNombre);
 		mensaje.put("tipo_operacion",0);
 		salida.println(mensaje);
@@ -104,6 +108,7 @@ public class ClienteAPI {
 	 */
 	public void enviarMensaje(String cuerpo) {
 		JSONObject mensaje = new JSONObject();
+		mensaje.put("nombre", nombre);
 		mensaje.put("cuerpo", cuerpo);
 		mensaje.put("tipo_operacion",3);
 		salida.println(mensaje);

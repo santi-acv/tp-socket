@@ -1,5 +1,5 @@
 //package cliente;
-import javax.swing.JOptionPane;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -71,7 +71,6 @@ public class ClienteGUIMain extends JFrame {
 		    System.exit(1);
         }
 		
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 632, 447);
 		contentPane = new JPanel();
@@ -110,6 +109,7 @@ public class ClienteGUIMain extends JFrame {
 				}
 				if (!nombreNuevo.equals("")) {
 					cliente.cambiarNombre(nombreNuevo);
+					JOptionPane.showMessageDialog(null, "Nombre cambiado correctamente");
 				}
 			}
 		});
@@ -224,133 +224,13 @@ public class ClienteGUIMain extends JFrame {
 		
 		public void run() {
 			String line;
-			
-			String parts[]=null;
-			String dobleSplit[]=null;
-
-			
 			try {
 				while ((line = in.readLine()) != null) {
 				    //Append a la pantalla lo que se desea mostrar, line es el json que recibe del servidor TODO: Hacer que se imprima todo ya
-					
-
-
-					char operacion=line.charAt(line.length()-2);//obtengo numero operacion
-
-
-					if(line.charAt(line.length()-3)=='-'){//desconectar
-						operacion='9';
-					}
-
-
-					switch(operacion){
-
-						case'0'://nombre
-
-							parts=line.split(",");
-							dobleSplit=parts[0].split(":");
-							if(dobleSplit[1].equalsIgnoreCase("0")){	
-								JOptionPane.showMessageDialog(null, "Nombre cambiado correctamente");
-							}else{
-								dobleSplit=parts[1].split(":");
-								JOptionPane.showMessageDialog(null, dobleSplit[1]);
-							}
-							break;	
-						case'1'://lista
-					    	parts=line.split(",");
-					    	
-							pantalla.append("PUERTO"+"         "+"IP"+"                   "+"NOMBRE"+ "             "+"DISPONIBLE\n");
-							
-							
-							String disponible[];
-							String nombre[];
-							String ip[];
-							String puerto[];
-							
-							
-							int numero;
-							
-							for(int c=2;c<(parts.length-1); ) {
-							
-							    disponible=parts[c+3].split(":");
-							    disponible=disponible[1].split("}");
-							    if(parts[c+2].contains("/"))
-							    		nombre=parts[c+2].split("/");
-							    else {
-						    		nombre=parts[c+2].split(":");
-						    		nombre[1]=nombre[1].substring(1);
-							    }
-
-								ip=parts[c+1].split("/");
-								
-								if(c==2)
-									numero=2;
-								else
-									numero=1;
-								
-								puerto=parts[c].split(":");
-								
-								pantalla.append(puerto[numero]+"      "+ip[1].substring(0, ip[1].length()-1)+"       "+nombre[1].substring(0, nombre[1].length()-1)+"            "+ disponible[0]+"\n\n");
-								c=c+4;
-							}	
-
-							break;
-						
-						case'2'://realizar
-							parts=line.split(",");
-							dobleSplit=parts[0].split(":");
-							if(dobleSplit[1].equalsIgnoreCase("0")){	
-								pantalla.append("***REALIZANDO LLAMADA, FAVOR ESPERE***");
-								pantalla.append("\n\n");
-							}else{
-								dobleSplit=parts[1].split(":");
-								JOptionPane.showMessageDialog(null, dobleSplit[1]);
-							}
-							break;
-						case'3'://mensaje
-							parts=line.split(",");
-							if(parts.length==2){	
-								dobleSplit=parts[0].split(":");	
-								pantalla.append("MENSAJE RECIBIDO: " + dobleSplit[1]);
-								//NO SE DE QUIEN RECIBIO EL MENSAJE Y NO PUDE HACER QUE PASE ESO 
-								pantalla.append("\n");
-							}else if(parts.length!=2){
-								dobleSplit=parts[1].split(":");
-								JOptionPane.showMessageDialog(null,"ENVIADO");
-							}
-							break;
-						case'4'://terminar
-							parts=line.split(",");
-							dobleSplit=parts[0].split(":");
-							if(dobleSplit[1].equalsIgnoreCase("0")){	
-								pantalla.append("---LLAMADA TERMINADA---");
-								pantalla.append("\n\n");
-							}else{
-								dobleSplit=parts[1].split(":");
-								JOptionPane.showMessageDialog(null, dobleSplit[1]);
-							}
-							break;
-						case'5'://contestar
-							parts=line.split(",");
-							dobleSplit=parts[0].split(":");
-							if(!dobleSplit[1].equalsIgnoreCase("7")){	
-								pantalla.append("<<<LLAMADA EN LINEA, PUEDE CONVERSAR>>>");
-								pantalla.append("\n\n");
-							}else{
-								dobleSplit=parts[1].split(":");
-								JOptionPane.showMessageDialog(null, dobleSplit[1]);
-							}
-							break;
-						case'9':
-							JOptionPane.showMessageDialog(null, "Se ha Desconectado");//funciona todo
-							break;
-
-					}
-					
-				
-					
-					
-					
+					//procesado el json
+					pantalla.append(line);
+					//pantalla.append(line);
+					pantalla.append("\n");
 					pantalla.setCaretPosition(pantalla.getDocument().getLength());
 				}
 			} catch (IOException e) {

@@ -5,6 +5,7 @@ import recursos.Conexion.Estado;
 import recursos.CodigoEstado;
 import recursos.InterfazJSON;
 import recursos.Registro;
+import recursos.BaseDatos;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -38,21 +39,21 @@ public class HiloUsuario extends Thread {
             	
             	// cerrar sesion
             	case -1:
-            		Conexion destino = enlace;
-            		if (destino != null) {
-            			Registro.terminarLlamada(conexion, enlace);
-            			destino.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA, 4);
-            		}
-            		json.enviarEstado(CodigoEstado.OK);
             		Registro.tabla.remove(nombre);
-            		conexion.cerrar();
+            		json.enviarEstado(CodigoEstado.OK);
+            		json.cerrar();
             		socket.close();
             		return;
             	
             	// cambiar nombre
             	case 0:
-            		if ((nombre = json.obtenerNombre()) != null)
-            			json.enviarEstado(Registro.cambiarNombre(nombre, conexion));
+            		if ((nombre = json.obtenerNombre()) == null) {
+            			json.enviarEstado(CodigoEstado.FALTA_NOMBRE);
+            		} else if (!Registro.cambiarNombre(nombre, conexion)) {
+            			json.enviarEstado(CodigoEstado.NOMBRE_DUPLICADO);
+            		} else {
+            			json.enviarEstado(CodigoEstado.OK);
+            		}
             		break;
             	
             	// ver clientes conectados
@@ -63,6 +64,7 @@ public class HiloUsuario extends Thread {
             	
             	// iniciar llamada
             	case 2:
+            		Conexion destino;
         			HiloLlamada hilo;
             		if (conexion.estado != Estado.IDLE) {
             			json.enviarEstado(CodigoEstado.ORIGEN_OCUPADO);
@@ -91,10 +93,11 @@ public class HiloUsuario extends Thread {
             	
             	// terminar llamada
             	case 4:
-            		destino = enlace;
             		if (enlace != null && Registro.terminarLlamada(conexion, enlace)) {
             			json.enviarEstado(CodigoEstado.OK);
-            			destino.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA, 4);
+            			enlace.json.enviarEstado(CodigoEstado.LLAMADA_CORTADA);
+            			enlace.reiniciar();
+            			conexion.reiniciar();
             		} else {
             			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
@@ -104,7 +107,7 @@ public class HiloUsuario extends Thread {
             	case 5:
             		if (enlace != null && Registro.contestarLLamada(enlace, conexion)) {
             			json.enviarEstado(CodigoEstado.OK);
-            			enlace.json.enviarEstado(CodigoEstado.OK, 5);
+            			enlace.json.enviarEstado(CodigoEstado.OK);
             		} else {
             			json.enviarEstado(CodigoEstado.NO_HAY_LLAMADA);
             		}
