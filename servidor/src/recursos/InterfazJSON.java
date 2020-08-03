@@ -43,7 +43,10 @@ public class InterfazJSON {
 	}
 
 	public String obtenerNombre() {
-		return mensaje.optString("nombre");
+		String nombre = mensaje.optString("nombre");
+		if (nombre == null)
+			enviarEstado(CodigoEstado.FALTA_NOMBRE);
+		return nombre;
 	}
 
 	public String obtenerDestino() {
@@ -70,7 +73,7 @@ public class InterfazJSON {
 		}
 	}
 	
-	public void enviarEstado(CodigoEstado codigo) {
+	public void enviarEstado(CodigoEstado codigo, int tipo_operacion) {
 		JSONObject respuesta = new JSONObject();
 		respuesta.put("estado", codigo.estado);
 		respuesta.put("mensaje", codigo.mensaje);
@@ -84,12 +87,16 @@ public class InterfazJSON {
 					out.println("Se ha terminado la llamada.");
 					break;
 				case 5:
-					out.println("Has contestado la llamada.");
+					out.println("Llamada establecida.");
 					break;
 			}
 		}else {
 			out.println(respuesta.optString("mensaje"));
 		}
+	}
+	
+	public void enviarEstado(CodigoEstado codigo) {
+		enviarEstado(codigo, tipo_operacion);
 	}
 	
 	public Consumer<Conexion> agregarLista() {
