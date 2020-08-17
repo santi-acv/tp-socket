@@ -38,6 +38,8 @@ Contraseña: postgres
 
 En caso de que se utilice una base de datos remota, estas propeidades se pueden modificar en el archivo `servidor/src/servidor/BaseDatos.java`. Para crear las tablas correspondientes, la base de datos debe ejecutar el archivo `basedatos/crear_tablas.sql`. Para vaciar o eliminar las tablas de la base de datos se pueden utilizar los archivos `basedatos/vaciar_historial.sql` o `basedatos/eliminar_tablas.sql` respectivamente.
 
+Cómo poblar los datos iniciales necesarios de Base de datos
+-----------------------------------------------------------
 
 Compilación y ejecución del servidor
 ------------------------------------
@@ -254,3 +256,7 @@ Envía un mensaje a otro cliente. El cuerpo del mensaje debe estar contenido en 
 |    0   | El servidor ha recibido el mensaje. |
 |    7   | No se encuentra en ninguna llamada. |
 |   -5   | Falta el campo `cuerpo`.            |
+
+Especificación de la forma de invocación y parámetros de cada servicio ofrecido por el servidor
+-------------------------------------------------------------------------------------------
+
