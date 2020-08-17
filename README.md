@@ -11,13 +11,14 @@ Integrantes del grupo:
 * Monica Auler
 
 
-Instalación
-===========
-
-Requerimientos
+Requerimientos de Instalación
 --------------
 
 * Java 1.8 o superior *(cliente y servidor)*
+
+* Software de desarrollo como por ejemplo *ECLIPSE*
+
+* Git: Software de control de versiones
 
 * PostgreSQL 8.2 o superior *(servidor)*
 
