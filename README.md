@@ -14,7 +14,6 @@ Integrantes del grupo:
 Requerimientos de Instalación
 --------------
 
-* Instalar el JDK de Java
 
 * Java 1.8 o superior *(cliente y servidor)*
 
