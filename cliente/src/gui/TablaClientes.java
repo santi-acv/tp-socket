@@ -45,7 +45,7 @@ public class TablaClientes extends JTable {
 			data[i][0] = o.opt("nombre");
 			data[i][1] = o.opt("ip");
 			data[i][2] = o.opt("puerto");
-			data[i][3] = o.opt("disponible");
+			data[i][3] = ((boolean) (o.opt("disponible"))) ? "Sí" : "No";
 			i++;
 		}
 		SwingUtilities.invokeLater(() -> {
@@ -53,6 +53,10 @@ public class TablaClientes extends JTable {
 				panel.botonActualizar.setEnabled(true);
 				panel.botonLlamar.setEnabled(false);
 				this.getSelectionModel().addListSelectionListener(listener);
+				
+				// cambiar el render para las celdas
+				this.setDefaultRenderer(Object.class, new RenderCeldas(3));
+				this.getColumnModel().getColumn(3).setCellRenderer(new RenderCeldasCentrado(3));
 		});
 	}
 	
@@ -60,7 +64,7 @@ public class TablaClientes extends JTable {
 		private static final long serialVersionUID = 1L;
 		
 		ModeloTabla(Object[][] data, String[] columnNames) {
-			super(data, columnNames);
+			super(data, columnNames);	
 		}
 		
 		@Override

@@ -26,6 +26,9 @@ public class HiloEnlace extends Thread {
 	private VistaPrincipal vista;
 	private ChatLlamada chat;
 	private DialogoOpcion dialogo;
+	private String miNuevoNombre = "";
+	private String nombreDestino = "";
+	
 	
 	public void run() {
 		try {
@@ -39,6 +42,8 @@ public class HiloEnlace extends Thread {
 				case 0:
 					if (mensaje.getInt("estado") != 0)
 						dialogo.mostrarError(mensaje);
+					else
+						frame.setTitle(miNuevoNombre);
 					break;
 				
 				// lista de clientes
@@ -51,7 +56,10 @@ public class HiloEnlace extends Thread {
 				case 2:
 					int estado = mensaje.getInt("estado");
 					if (estado == 1)
+					{
+						nombreDestino = mensaje.getString("origen");
 						dialogo.llamadaEntrante(mensaje.getString("origen"));
+					}
 					else if (estado == 3)
 						dialogo.llamadaTerminada(mensaje);
 					else
@@ -79,6 +87,8 @@ public class HiloEnlace extends Thread {
 						dialogo.cerrar();
 						SwingUtilities.invokeLater(() -> {
 							frame.reemplazar(vista, chat);
+							chat.setNombreDestino(nombreDestino);
+							chat.clsArea();
 							dialogo.panel = chat;
 						});
 					}
@@ -98,7 +108,8 @@ public class HiloEnlace extends Thread {
 	}
 	
 	public void cambiarNombre(String nombre) {
-		out.println("{\"tipo_operacion\":0,\"nombre\":\""+nombre+"\"}");
+		miNuevoNombre = "TP Socket - Cliente: " + nombre;
+		out.println("{\"tipo_operacion\":0,\"nombre\":\""+nombre+"\"}");		
 	}
 	
 	public void actualizarListaClientes() {
@@ -108,6 +119,7 @@ public class HiloEnlace extends Thread {
 	public void iniciarLlamada(String destino) {
 		out.println("{\"tipo_operacion\":2,\"destino\":\""+destino+"\"}");
 		dialogo.llamadaSaliente(destino);
+		nombreDestino = destino;
 	}
 	
 	public void aceptarLlamada() {
@@ -157,4 +169,5 @@ public class HiloEnlace extends Thread {
 			System.exit(1);
 		}
 	}
+		
 }

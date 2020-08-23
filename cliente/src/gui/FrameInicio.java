@@ -11,7 +11,7 @@ import app.HiloEnlace;
 
 public class FrameInicio extends JFrame {
 	private static final long serialVersionUID = 1L;
-	public final Dimension size = new Dimension(400, 300);
+	public final Dimension size = new Dimension(500, 400);
 	
 	public FrameInicio() {
 		super("TP Socket - Cliente");

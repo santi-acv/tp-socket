@@ -12,7 +12,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
 import app.HiloEnlace;
 
 public class ChatLlamada extends JPanel {
@@ -23,6 +22,7 @@ public class ChatLlamada extends JPanel {
 	private JScrollPane scrollpane;
 	private JButton botonEnviar;
 	private JButton botonCortar;
+	private String nombreDes = "";
 	
 	public ChatLlamada(HiloEnlace enlace, FrameInicio frame, VistaPrincipal vista, DialogoOpcion dialogo) {
 		super(new GridBagLayout());
@@ -35,7 +35,9 @@ public class ChatLlamada extends JPanel {
 		area.setWrapStyleWord(true);
 		area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		field = new JTextField(20);
+		
 		field.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		field.setToolTipText("Escribe un mensaje aquí");
 		scrollpane = new JScrollPane(area);
 		botonEnviar = new JButton("Enviar");
 		botonCortar = new JButton("Cortar");
@@ -61,12 +63,13 @@ public class ChatLlamada extends JPanel {
 		add(botonEnviar, c);
 		add(botonCortar, c);
 		
+		
 		// envia el mensaje
 		ActionListener listener = e -> {
 			String mensaje = field.getText();
 			field.setText(null);
 			enlace.enviarMensaje(mensaje);
-			area.append(mensaje+"\n");
+			area.append("[Yo]: " + mensaje + "\n\n");
 		};
 		field.addActionListener(listener);
 		botonEnviar.addActionListener(listener);
@@ -77,10 +80,22 @@ public class ChatLlamada extends JPanel {
 			frame.reemplazar(this, vista);
 			dialogo.panel = vista;
 		});
+		
+	}
+	
+	public void setNombreDestino(String destino)
+	{
+		nombreDes = destino;
 	}
 	
 	public void agregarMensaje(String mensaje) {
 		SwingUtilities.invokeLater(() -> 
-			area.append(mensaje+"\n"));
+			area.append("[" + nombreDes + "]: " + mensaje+"\n\n"));
+	}
+	
+	/**para limpiar el area luego de una llamada*/
+	public void clsArea()
+	{
+		area.setText("");
 	}
 }

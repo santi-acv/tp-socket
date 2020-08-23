@@ -51,6 +51,7 @@ public class VistaPrincipal extends JPanel {
 			int row = tabla.getSelectedRow();
 			Object cliente = tabla.getModel().getValueAt(row, 0);
 			enlace.iniciarLlamada((String) cliente);
+			
 		});
 		
 		// actualiza la lista de clientes
