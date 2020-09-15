@@ -261,3 +261,17 @@ Envía un mensaje a otro cliente. El cuerpo del mensaje debe estar contenido en 
 |    0   | El servidor ha recibido el mensaje. |
 |    7   | No se encuentra en ninguna llamada. |
 |   -5   | Falta el campo `cuerpo`.            |
+
+Especificar la forma de invocación y parámetros de cada servicio ofrecido por el servidor
+==========================================================================================
+
+Forma de invocación de los servicios disponibles en la aplicación:
+
+I.	  Cambiar de nombre: hacer click en el botón “Cambiar nombre” de la aplicación y cargar el nuevo nombre del cliente en la ventana que se presenta.
+II.	  Mostrar clientes: en la aplicación ya se despliega la lista de los clientes conectados, muestra de cada cliente su Nombre, IP, Puerto y su disponibilidad para comenzar una llamada. Para actualizar la lista en caso de que existan nuevas conexiones o se eliminen conexiones hacer click en el botón “Actualizar”
+III.  Realizar llamada: seleccionar a un cliente de la lista presentada y hacer click en el botón “Llamar” de la aplicación. Se desplegará un cuadro donde muestra el nombre del cliente a quien se esta llamando.
+IV.	  Enviar mensaje: escribir el cuerpo del mensaje en el espacio en blanco en la sección inferior de la ventana de la llamada y hacer click en el botón “Enviar” . 
+V.	  Terminar llamada: click en el botón “Cortar” dentro de la ventana de llamada. Al otro cliente se le desplegará un cuadro donde se especifica que el usuario con quien hablaba ha cortado la llamada.
+VI.	  Contestar llamada: click en el botón “Contestar” en el cuadro que aparece cuando el cliente tiene una llamada entrante.
+VII.  Cerrar la conexión: click en el botón X de la esquina derecha superior de la ventana de la aplicación.
+
