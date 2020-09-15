@@ -32,6 +32,8 @@ public class HiloUsuario extends Thread {
             conexion = new Conexion(nombre, this, json, socket);
             Registro.tabla.put(nombre, conexion);
             
+           
+            
             // recibe un mensaje del socket y lo procesa segun el tipo
             while (true) {
             	switch (json.leerMensaje()) {
@@ -64,12 +66,14 @@ public class HiloUsuario extends Thread {
             	// iniciar llamada
             	case 2:
         			HiloLlamada hilo;
-            		if (conexion.estado != Estado.IDLE) {
+        			 if (conexion.estado != Estado.IDLE) {
             			json.enviarEstado(CodigoEstado.ORIGEN_OCUPADO);
             		} else if ((nombre = json.obtenerDestino()) == null) {
             			json.enviarEstado(CodigoEstado.FALTA_DESTINO);
             		} else if ((destino = Registro.tabla.get(nombre)) == null) {
             			json.enviarEstado(CodigoEstado.USUARIO_INVALIDO);
+            		} else if(conexion.equals(destino)) {
+            			json.enviarEstado(CodigoEstado.AUTOLLAMADA);
             		} else if ((hilo = Registro.establecerLlamada(conexion, destino)) == null) {
             			json.enviarEstado(CodigoEstado.DESTINO_OCUPADO);
             		} else {

@@ -31,6 +31,11 @@ public class MainServidor {
 		new HiloSocketUDP(socketUDP).start();
 		
 		// acepta conexiones con los clientes
+		
+		System.out.println("SERVIDOR");
+		System.out.println("Esperando a algun cliente... ");
+
+		
 		while (abierto) {
 			new HiloUsuario(socketTCP.accept()).start();
 		}
