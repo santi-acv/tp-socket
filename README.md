@@ -41,9 +41,17 @@ En caso de que se utilice una base de datos remota, estas propeidades se pueden 
 Compilación y ejecución del servidor
 ------------------------------------
 
+1. 	Importar en el software Eclipse el proyecto Maven llamado “servidor” que se encuentra dentro de la carpeta “tp-socket”.
+2.	El servidor es del tipo Multi-Servidor.
+3.	Con el botón “Run MainServidor,java” compilar y ejecutar el archivo java llamado “MainServidor” una sola vez.
+4.	Si ejecuta más de una vez podría encontrar el error: no se puede abrir el puerto 4444, porque se utiliza actualmente ese puerto para el servidor activo.
+
 
 Compilación y ejecución de los clientes
 ---------------------------------------
+1.	Importar en el software Eclipse el proyecto Maven llamado “cliente” que se encuentra dentro de la carpeta “tp-socket”.
+2.	Con el botón “Run AppCliente.java” compilar y ejecutar el archivo java llamado “AppCliente” 2 o más veces para poder realizar una o más llamadas entre 2 clientes conectados que se encuentren disponibles.
+3.	Se habilita una interfaz donde debe proceder a utilizar los servicios disponibles para los clientes.
 
 
 API de servicios
