@@ -9,15 +9,15 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class RenderCeldas extends DefaultTableCellRenderer {
 	private static final long serialVersionUID = 1L;
 	
-	private int columna ;
+	protected int columna ;
 	
-	private static final String colorDisponible="#20A500";
-	private static final String fondoDisponible="#DEFFDD";
+	protected static final String colorDisponible="#20A500";
+	protected static final String fondoDisponible="#DEFFDD";
 	
-	private static final String colorNoDisponible="#6A6A6A";
-	private static final String fondoNoDisponible="#E8E8E8";
+	protected static final String colorNoDisponible="#6A6A6A";
+	protected static final String fondoNoDisponible="#E8E8E8";
 	
-	private static final String fondoSeleccion="#ACB6EA";
+	protected static final String fondoSeleccion="#ACB6EA";
 
 
 	public RenderCeldas(int Colpatron)
