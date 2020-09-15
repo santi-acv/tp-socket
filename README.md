@@ -37,6 +37,9 @@ Contraseña: postgres
 
 En caso de que se utilice una base de datos remota, estas propeidades se pueden modificar en el archivo `servidor/src/servidor/BaseDatos.java`. Para crear las tablas correspondientes, la base de datos debe ejecutar el archivo `basedatos/crear_tablas.sql`. Para vaciar o eliminar las tablas de la base de datos se pueden utilizar los archivos `basedatos/vaciar_historial.sql` o `basedatos/eliminar_tablas.sql` respectivamente.
 
+Poblar los datos iniciales necesarios de Base de datos.
+------------------------------------------------------
+Para utilizar la aplicación no es necesario la carga de datos iniciales en la base de datos. Con cada operación realizada, con la ejecución de cada cliente y otras operaciones, inmediatamente en base de datos se agregan los nuevos datos.
 
 Compilación y ejecución del servidor
 ------------------------------------
