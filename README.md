@@ -269,20 +269,27 @@ Especificar la forma de invocación y parámetros de cada servicio ofrecido por 
 ==========================================================================================
 
 Forma de invocación de los servicios disponibles:
-I.	Cambiar de nombre: se invoca al servidor pasándole el tipo de operación (esta operación se representa con el número entero 0) y el nuevo nombre del cliente como un String.
+
+- Cambiar de nombre: se invoca al servidor pasándole el tipo de operación (esta operación se representa con el número entero 0) y el nuevo nombre del cliente como un String.
 "{\"tipo_operacion\":0,\"nombre\":\""+nombre+"\"}"
-II.	Actualizar clientes conectados: se invoca al servidor solamente comunicándole el tipo de operación (esta operación o servicio se representa con el número entero 1).
+
+- 	Actualizar clientes conectados: se invoca al servidor solamente comunicándole el tipo de operación (esta operación o servicio se representa con el número entero 1).
 "{\"tipo_operacion\":1}"
 Se despliega la lista actualizada de los clientes conectados, muestra de cada cliente su Nombre, IP, Puerto y su disponibilidad para comenzar una llamada. 
-III.	Realizar llamada: se invoca al servidor enviándole el tipo de operación (en este caso el número entero 2) y la dirección del socket de destino (a quien va dirigido la solicitud de llamada).
+
+- Realizar llamada: se invoca al servidor enviándole el tipo de operación (en este caso el número entero 2) y la dirección del socket de destino (a quien va dirigido la solicitud de llamada).
 "{\"tipo_operacion\":2,\"destino\":\""+destino+"\"}"
-IV.	Enviar mensaje: se invoca al servidor pasándole el tipo de operación (en este caso el número 3 y el cuerpo del mensaje, que es un String. 
+
+- Enviar mensaje: se invoca al servidor pasándole el tipo de operación (en este caso el número 3 y el cuerpo del mensaje, que es un String. 
 "{\"tipo_operacion\":3,\"cuerpo\":\""+cuerpo+"\"}" 
-V.	Terminar llamada: se invoca al servidor solamente mandándole el tipo de operación (en este caso el número 4) y directamente termina la llamada actual entre los 2 clientes.
+
+- Terminar llamada: se invoca al servidor solamente mandándole el tipo de operación (en este caso el número 4) y directamente termina la llamada actual entre los 2 clientes.
 "{\"tipo_operacion\":4}"
-VI.	Contestar llamada: se invoca al servidor pasándole el tipo de operación (en este caso el n-úmero 5) y directamente el cliente contestará la llamada entrante.
+
+- Contestar llamada: se invoca al servidor pasándole el tipo de operación (en este caso el n-úmero 5) y directamente el cliente contestará la llamada entrante.
 "{\"tipo_operacion\":5}"
-VII.	Cerrar la conexión: se invoca al servidor pasándole el tipo de operación (en este caso el número -1) y se cerrara la conexión del cliente que realizo la invocación.
+
+- Cerrar la conexión: se invoca al servidor pasándole el tipo de operación (en este caso el número -1) y se cerrara la conexión del cliente que realizo la invocación.
 "{\"tipo_operacion\":-1}"
 
 
