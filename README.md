@@ -268,13 +268,21 @@ Envía un mensaje a otro cliente. El cuerpo del mensaje debe estar contenido en 
 Especificar la forma de invocación y parámetros de cada servicio ofrecido por el servidor
 ==========================================================================================
 
-Forma de invocación de los servicios disponibles en la aplicación:
+Forma de invocación de los servicios disponibles:
+I.	Cambiar de nombre: se invoca al servidor pasándole el tipo de operación (esta operación se representa con el número entero 0) y el nuevo nombre del cliente como un String.
+"{\"tipo_operacion\":0,\"nombre\":\""+nombre+"\"}"
+II.	Actualizar clientes conectados: se invoca al servidor solamente comunicándole el tipo de operación (esta operación o servicio se representa con el número entero 1).
+"{\"tipo_operacion\":1}"
+Se despliega la lista actualizada de los clientes conectados, muestra de cada cliente su Nombre, IP, Puerto y su disponibilidad para comenzar una llamada. 
+III.	Realizar llamada: se invoca al servidor enviándole el tipo de operación (en este caso el número entero 2) y la dirección del socket de destino (a quien va dirigido la solicitud de llamada).
+"{\"tipo_operacion\":2,\"destino\":\""+destino+"\"}"
+IV.	Enviar mensaje: se invoca al servidor pasándole el tipo de operación (en este caso el número 3 y el cuerpo del mensaje, que es un String. 
+"{\"tipo_operacion\":3,\"cuerpo\":\""+cuerpo+"\"}" 
+V.	Terminar llamada: se invoca al servidor solamente mandándole el tipo de operación (en este caso el número 4) y directamente termina la llamada actual entre los 2 clientes.
+"{\"tipo_operacion\":4}"
+VI.	Contestar llamada: se invoca al servidor pasándole el tipo de operación (en este caso el n-úmero 5) y directamente el cliente contestará la llamada entrante.
+"{\"tipo_operacion\":5}"
+VII.	Cerrar la conexión: se invoca al servidor pasándole el tipo de operación (en este caso el número -1) y se cerrara la conexión del cliente que realizo la invocación.
+"{\"tipo_operacion\":-1}"
 
-I.	  Cambiar de nombre: hacer click en el botón “Cambiar nombre” de la aplicación y cargar el nuevo nombre del cliente en la ventana que se presenta.
-II.	  Mostrar clientes: en la aplicación ya se despliega la lista de los clientes conectados, muestra de cada cliente su Nombre, IP, Puerto y su disponibilidad para comenzar una llamada. Para actualizar la lista en caso de que existan nuevas conexiones o se eliminen conexiones hacer click en el botón “Actualizar”
-III.  Realizar llamada: seleccionar a un cliente de la lista presentada y hacer click en el botón “Llamar” de la aplicación. Se desplegará un cuadro donde muestra el nombre del cliente a quien se esta llamando.
-IV.	  Enviar mensaje: escribir el cuerpo del mensaje en el espacio en blanco en la sección inferior de la ventana de la llamada y hacer click en el botón “Enviar” . 
-V.	  Terminar llamada: click en el botón “Cortar” dentro de la ventana de llamada. Al otro cliente se le desplegará un cuadro donde se especifica que el usuario con quien hablaba ha cortado la llamada.
-VI.	  Contestar llamada: click en el botón “Contestar” en el cuadro que aparece cuando el cliente tiene una llamada entrante.
-VII.  Cerrar la conexión: click en el botón X de la esquina derecha superior de la ventana de la aplicación.
 
