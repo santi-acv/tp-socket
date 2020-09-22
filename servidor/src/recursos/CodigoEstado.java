@@ -16,6 +16,7 @@ public enum CodigoEstado {
 	USUARIO_INVALIDO (8, "No existe un usuario con ese nombre."),
 	NOMBRE_DUPLICADO (9, "Ya existe un usuario con ese nombre."),
 	IP_INVALIDA     (10, "La IP del datagrama no está autorizada."),
+	AUTOLLAMADA     (11,"No es posible la autollamada"),
 	
 	// errores de formato
 	TIPO_INVALIDO   (-1, "No existe una operación con este código."),

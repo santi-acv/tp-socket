@@ -37,17 +37,26 @@ Usuario: postgres
 Contraseña: postgres
 ```
 
-En caso de que se utilice una base de datos remota, estas propeidades se pueden modificar en el archivo `servidor/src/servidor/BaseDatos.java`. Para crear las tablas correspondientes, la base de datos debe ejecutar el archivo `basedatos/crear_tablas.sql`. Para vaciar o eliminar las tablas de la base de datos se pueden utilizar los archivos `basedatos/vaciar_historial.sql` o `basedatos/eliminar_tablas.sql` respectivamente.
+En caso de que se utilice una base de datos remota, estas propiedades se pueden modificar en el archivo `servidor/src/servidor/BaseDatos.java`. Para crear las tablas correspondientes, la base de datos debe ejecutar el archivo `basedatos/crear_tablas.sql`. Para vaciar o eliminar las tablas de la base de datos se pueden utilizar los archivos `basedatos/vaciar_historial.sql` o `basedatos/eliminar_tablas.sql` respectivamente.
 
-Cómo poblar los datos iniciales necesarios de Base de datos
------------------------------------------------------------
+Poblar los datos iniciales necesarios de la Base de datos.
+------------------------------------------------------
+Para utilizar la aplicación no es necesario la carga de datos iniciales en la base de datos. Con cada operación realizada, con la ejecución de cada cliente y otras operaciones, inmediatamente en base de datos se agregan los nuevos datos.
 
 Compilación y ejecución del servidor
 ------------------------------------
 
+1. 	Importar en el software Eclipse el proyecto Maven llamado “servidor” que se encuentra dentro de la carpeta “tp-socket”.
+2.	El servidor es del tipo Multi-Servidor.
+3.	Con el botón “Run MainServidor,java” compilar y ejecutar el archivo java llamado “MainServidor” una sola vez.
+4.	Si ejecuta más de una vez podría encontrar el error: no se puede abrir el puerto 4444, porque se utiliza actualmente ese puerto para el servidor activo.
+
 
 Compilación y ejecución de los clientes
 ---------------------------------------
+1.	Importar en el software Eclipse el proyecto Maven llamado “cliente” que se encuentra dentro de la carpeta “tp-socket”.
+2.	Con el botón “Run AppCliente.java” compilar y ejecutar el archivo java llamado “AppCliente” 2 o más veces para poder realizar una o más llamadas entre 2 clientes conectados que se encuentren disponibles.
+3.	Se habilita una interfaz donde debe proceder a utilizar los servicios disponibles para los clientes.
 
 
 API de servicios
@@ -258,6 +267,29 @@ Envía un mensaje a otro cliente. El cuerpo del mensaje debe estar contenido en 
 |    7   | No se encuentra en ninguna llamada. |
 |   -5   | Falta el campo `cuerpo`.            |
 
-Especificación de la forma de invocación y parámetros de cada servicio ofrecido por el servidor
--------------------------------------------------------------------------------------------
+Especificar la forma de invocación y parámetros de cada servicio ofrecido por el servidor
+==========================================================================================
 
+Forma de invocación de los servicios disponibles:
+
+- Cambiar de nombre: se invoca al servidor pasándole el tipo de operación (esta operación se representa con el número entero 0) y el nuevo nombre del cliente como un String.
+"{\"tipo_operacion\":0,\"nombre\":\""+nombre+"\"}"
+
+- 	Actualizar clientes conectados: se invoca al servidor solamente comunicándole el tipo de operación (esta operación o servicio se representa con el número entero 1).
+"{\"tipo_operacion\":1}"
+Se despliega la lista actualizada de los clientes conectados, muestra de cada cliente su Nombre, IP, Puerto y su disponibilidad para comenzar una llamada. 
+
+- Realizar llamada: se invoca al servidor enviándole el tipo de operación (en este caso el número entero 2) y la dirección del socket de destino (a quien va dirigido la solicitud de llamada).
+"{\"tipo_operacion\":2,\"destino\":\""+destino+"\"}"
+
+- Enviar mensaje: se invoca al servidor pasándole el tipo de operación (en este caso el número 3 y el cuerpo del mensaje, que es un String. 
+"{\"tipo_operacion\":3,\"cuerpo\":\""+cuerpo+"\"}" 
+
+- Terminar llamada: se invoca al servidor solamente mandándole el tipo de operación (en este caso el número 4) y directamente termina la llamada actual entre los 2 clientes.
+"{\"tipo_operacion\":4}"
+
+- Contestar llamada: se invoca al servidor pasándole el tipo de operación (en este caso el n-úmero 5) y directamente el cliente contestará la llamada entrante.
+"{\"tipo_operacion\":5}"
+
+- Cerrar la conexión: se invoca al servidor pasándole el tipo de operación (en este caso el número -1) y se cerrara la conexión del cliente que realizo la invocación.
+"{\"tipo_operacion\":-1}"
