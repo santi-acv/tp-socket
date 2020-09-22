@@ -59,14 +59,12 @@ public class InterfazJSON {
 		llamada.put("mensaje", CodigoEstado.LLAMADA_ENTRANTE.mensaje);
 		llamada.put("tipo_operacion", tipo_operacion);
 		llamada.put("origen", nombre);
-		json.out.println(llamada.optString("origen") + " quiere iniciar una llamada.");
-		enviarEstado(CodigoEstado.OK);
+		json.out.println(llamada.toString());
 	}
 
 	public void redirigirMensaje(InterfazJSON json) {
 		if (mensaje.has("cuerpo")) {
-			out.println(mensaje.optString("nombre") + ": " + mensaje.optString("cuerpo"));
-			json.out.println(mensaje.optString("nombre") + ": " + mensaje.optString("cuerpo"));
+			json.out.println(mensaje);
 			enviarEstado(CodigoEstado.OK);
 		} else {
 			enviarEstado(CodigoEstado.FALTA_CUERPO);
@@ -78,21 +76,7 @@ public class InterfazJSON {
 		respuesta.put("estado", codigo.estado);
 		respuesta.put("mensaje", codigo.mensaje);
 		respuesta.put("tipo_operacion", tipo_operacion);
-		if(codigo == CodigoEstado.OK) {
-			switch(respuesta.getInt("tipo_operacion")) {
-				case 2:
-					out.println("Llamando a " + mensaje.optString("destino") + "...");
-					break;
-				case 4:
-					out.println("Se ha terminado la llamada.");
-					break;
-				case 5:
-					out.println("Llamada establecida.");
-					break;
-			}
-		}else {
-			out.println(respuesta.optString("mensaje"));
-		}
+		out.println(respuesta.toString());
 	}
 	
 	public void enviarEstado(CodigoEstado codigo) {
@@ -116,16 +100,12 @@ public class InterfazJSON {
 	}
 
 	public void enviarLista() {
-		int i;
 		JSONObject respuesta = new JSONObject();
 		respuesta.put("estado", 0);
 		respuesta.put("mensaje", "ok");
 		respuesta.put("tipo_operacion", tipo_operacion);
 		respuesta.put("lista_clientes", lista_clientes);
-		out.println("CLIENTES CONECTADOS");
-		for(i = 0; i < lista_clientes.length(); i++){
-			out.println(lista_clientes.getJSONObject(i).optString("nombre"));
-		}
+		out.println(respuesta.toString());
 		lista_clientes = null;
 	}
 
