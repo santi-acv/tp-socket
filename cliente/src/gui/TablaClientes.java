@@ -45,7 +45,7 @@ public class TablaClientes extends JTable {
 			data[i][0] = o.opt("nombre");
 			data[i][1] = o.opt("ip");
 			data[i][2] = o.opt("puerto");
-			data[i][3] = ((boolean) (o.opt("disponible"))) ? "SÃ­" : "No";
+			data[i][3] = ((boolean) (o.opt("disponible"))) ? "Sí" : "No";
 			i++;
 		}
 		SwingUtilities.invokeLater(() -> {
