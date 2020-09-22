@@ -32,7 +32,7 @@ public class RenderCeldas extends DefaultTableCellRenderer {
 	    table.setForeground(Color.black);
 	    super.getTableCellRendererComponent(table, value, selected, focused, row, column);
 	    
-	    if(table.getValueAt(row,columna).equals("Sí"))
+	    if(table.getValueAt(row,columna).equals("SÃ­"))
 	    {
 	        this.setForeground(Color.decode(colorDisponible));
 	        this.setBackground(Color.decode(fondoDisponible));
