@@ -1,4 +1,6 @@
-https://docs.google.com/document/d/1rUhwpmuTmqkFFpGbaqO-_PJW0e6X2CpqukvbDY3jDgM/view
+# Trabajo práctico de Sistemas Distribuídos
+
+Consiste en un sistema de llamadas basado en texto, el cual permite a los usuarios conectarse y llevar a cabo conversaciones. Utiliza un modelo cliente-servidor y un protocolo orientado a la conexión, similar a los sistemas telefónicos de línea baja.
 
 
 Integrantes del grupo:
